@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kmyo-schedule-v2';
+const CACHE_NAME = 'kmyo-schedule-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

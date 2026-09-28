@@ -21,6 +21,7 @@
       --border: #e2e8f0;
       --live-green: #10b981;
       --live-bg: #ecfdf5;
+      --amfi1: #e11d48;
       --amfi2: #7c3aed;
       --amfi3: #0284c7;
       --amfi4: #d97706;
@@ -284,6 +285,7 @@
       color: white;
       letter-spacing: 0.3px;
     }
+    .room-amfi1 { background-color: var(--amfi1); }
     .room-amfi2 { background-color: var(--amfi2); }
     .room-amfi3 { background-color: var(--amfi3); }
     .room-amfi4 { background-color: var(--amfi4); }
@@ -397,7 +399,7 @@
       padding: 24px 20px 30px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 15px;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
       animation: slideUp 0.25s ease-out;
     }
@@ -426,7 +428,7 @@
       font-weight: 700;
       color: var(--text);
     }
-    .form-select, .form-input {
+    .form-select {
       padding: 12px;
       border-radius: 12px;
       border: 1px solid var(--border);
@@ -456,7 +458,7 @@
     .modal-btn-row {
       display: flex;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .btn-save {
       flex: 2;
@@ -559,7 +561,7 @@
 
       <div class="form-group">
         <label class="form-label">Hangi Güne Taşınsın?</label>
-        <select class="form-select" id="targetDaySelect">
+        <select class="form-select" id="targetDaySelect" onchange="updateTargetRoomDefault()">
           <option value="1">Pazartesi</option>
           <option value="2">Salı</option>
           <option value="3">Çarşamba</option>
@@ -570,7 +572,7 @@
 
       <div class="form-group">
         <label class="form-label">Hangi Saate Taşınsın?</label>
-        <select class="form-select" id="targetSlotSelect">
+        <select class="form-select" id="targetSlotSelect" onchange="updateTargetRoomDefault()">
           <option value="08:15-09:00">1. Ders (08:15 - 09:00)</option>
           <option value="09:15-10:00">2. Ders (09:15 - 10:00)</option>
           <option value="10:15-11:00">3. Ders (10:15 - 11:00)</option>
@@ -582,6 +584,21 @@
           <option value="16:10-16:55">8. Ders (16:10 - 16:55)</option>
           <option value="17:00-17:45">9. Ders (17:00 - 17:45)</option>
           <option value="18:00-18:45">10. Ders (18:00 - 18:45)</option>
+        </select>
+      </div>
+
+      <!-- SINIF / AMFİ SEÇİCİ -->
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label class="form-label">Derslik / Sınıf:</label>
+          <span id="roomAutoHint" style="font-size:11px; color:var(--primary); font-weight:700;"></span>
+        </div>
+        <select class="form-select" id="targetRoomSelect">
+          <option value="74 KMYO Amfi-1">74 KMYO Amfi-1</option>
+          <option value="74 KMYO Amfi-2">74 KMYO Amfi-2</option>
+          <option value="74 KMYO Amfi-3">74 KMYO Amfi-3</option>
+          <option value="74 KMYO Amfi-4">74 KMYO Amfi-4</option>
+          <option value="Ofis">Ofis / Danışmanlık</option>
         </select>
       </div>
 
@@ -600,7 +617,7 @@
       </div>
 
       <div style="font-size:12px; color:var(--text-muted); background:var(--bg); padding:10px; border-radius:10px;">
-        💡 <b>Not:</b> Taşınan dersin orijinal günündeki saati silinmez; tam istediğiniz gibi <b>soluk</b> görünür ve üzerinde taşındığı saat yazar.
+        💡 <b>Kural:</b> Taşınan ders hedef saatte başka bir dersle buluştuğunda sınıf otomatik olarak o dersin sınıfı yapılır. Dilerseniz yukarıdaki menüden <b>Amfi 1, 2, 3 veya 4</b> olarak değiştirebilirsiniz. Orijinal gününde ise ders silinmeyip <b>soluk</b> kalır.
       </div>
 
       <div class="modal-btn-row">
@@ -698,6 +715,16 @@
 
     const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma" };
 
+    function getRoomClass(roomName) {
+      if (!roomName) return 'room-amfi3';
+      if (roomName.includes('Amfi-1')) return 'room-amfi1';
+      if (roomName.includes('Amfi-2')) return 'room-amfi2';
+      if (roomName.includes('Amfi-3')) return 'room-amfi3';
+      if (roomName.includes('Amfi-4')) return 'room-amfi4';
+      if (roomName.includes('Ofis')) return 'room-ofis';
+      return 'room-amfi3';
+    }
+
     // 4. Dinamik Değişiklik Yönetimi (LocalStorage Destekli)
     let movedOverrides = JSON.parse(localStorage.getItem('kmyo_moved_overrides') || '{}');
     let activeDay = 1;
@@ -721,7 +748,7 @@
       const count = Object.keys(movedOverrides).length;
       if (count > 0) {
         banner.style.display = 'flex';
-        document.getElementById('changesText').innerText = `⚡ ${count} dersin saati/günü değiştirildi.`;
+        document.getElementById('changesText').innerText = `⚡ ${count} dersin saati/sınıfı değiştirildi.`;
       } else {
         banner.style.display = 'none';
       }
@@ -762,10 +789,10 @@
       baseSlots.forEach(slot => {
         const override = movedOverrides[slot.id];
         if (override) {
-          // Bu ders başka güne taşınmış!
           slot.isMovedSource = true;
           slot.movedTargetDay = override.targetDay;
           slot.movedTargetSlot = override.targetSlot;
+          slot.movedTargetRoom = override.targetRoom;
           slot.conflictMode = override.conflictMode;
           result.push(slot); // Orijinal yerinde soluk kalacak
         } else {
@@ -784,14 +811,18 @@
           }
           if (origSlot) {
             const [targetS, targetE] = override.targetSlot.split('-');
+            const finalRoom = override.targetRoom || origSlot.room;
             const movedInstance = {
               ...origSlot,
               start: targetS,
               end: targetE,
+              room: finalRoom,
+              roomClass: getRoomClass(finalRoom),
               isRelocatedTarget: true,
               fromDay: origSlot.originalDay,
               origStart: origSlot.start,
               origEnd: origSlot.end,
+              origRoom: origSlot.room,
               conflictMode: override.conflictMode,
               overrideKey: slotId
             };
@@ -850,7 +881,7 @@
         if (isNow) {
           statusBadgeHtml = '<span style="color:#10b981;font-size:11px;font-weight:700;">● ŞU AN</span>';
         } else if (slot.isMovedSource) {
-          statusBadgeHtml = `<div class="moved-badge">⚠️ ${dayNames[slot.movedTargetDay]} ${slot.movedTargetSlot}'e taşındı (Soluk)</div>`;
+          statusBadgeHtml = `<div class="moved-badge">⚠️ ${dayNames[slot.movedTargetDay]} ${slot.movedTargetSlot}'e taşındı (${slot.movedTargetRoom})</div>`;
         } else if (slot.isRelocatedTarget) {
           statusBadgeHtml = `<div class="relocated-target-badge">🔄 ${dayNames[slot.fromDay]} ${slot.origStart}'den buraya taşındı</div>`;
         }
@@ -874,7 +905,7 @@
           <div class="course-title" style="${slot.isMovedSource ? 'text-decoration: line-through; opacity: 0.8;' : ''}">${slot.title}</div>
           <div class="course-code">${slot.code}</div>
           <div class="card-footer">
-            <span style="font-size:11px; color:var(--text-muted);">${slot.room}</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">📍 ${slot.room}</span>
             ${actionBtnHtml}
           </div>
         `;
@@ -884,7 +915,6 @@
 
     // Modal İşlemleri
     function openMoveModal(slotId) {
-      // Orijinal slotu bul
       let slot = null;
       for (let d = 1; d <= 5; d++) {
         const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
@@ -893,9 +923,38 @@
       if (!slot) return;
 
       selectedSlotToMove = slot;
-      document.getElementById('modalCourseInfo').innerText = `${slot.title} (${dayNames[slot.day]} ${slot.start} - ${slot.end})`;
+      document.getElementById('modalCourseInfo').innerText = `${slot.title} (${dayNames[slot.day]} ${slot.start} - ${slot.end} • ${slot.room})`;
       document.getElementById('targetDaySelect').value = slot.day === 5 ? 1 : slot.day + 1; // Bir sonraki gün öner
+      
+      updateTargetRoomDefault();
       document.getElementById('moveModal').classList.add('active');
+    }
+
+    // Hedef saate göre sınıfı otomatik belirle
+    function updateTargetRoomDefault() {
+      if (!selectedSlotToMove) return;
+      const targetDay = parseInt(document.getElementById('targetDaySelect').value);
+      const targetSlot = document.getElementById('targetSlotSelect').value;
+      const [tsStart] = targetSlot.split('-');
+
+      // Hedef günde o saatte mevcut bir ders var mı?
+      const targetDaySlots = baseScheduleData[targetDay]?.slots || [];
+      const existingSlot = targetDaySlots.find(s => s.start === tsStart);
+
+      const roomSelect = document.getElementById('targetRoomSelect');
+      const hint = document.getElementById('roomAutoHint');
+
+      if (existingSlot) {
+        // Hedefte ders var -> Sınıf o dersin sınıfı kalsın
+        roomSelect.value = existingSlot.room;
+        hint.innerText = `✓ Hedefteki sınıf (${existingSlot.room}) seçildi`;
+        hint.style.color = 'var(--primary)';
+      } else {
+        // Hedefte ders yok -> Orijinal sınıfı koru
+        roomSelect.value = selectedSlotToMove.room;
+        hint.innerText = `✓ Orijinal sınıf (${selectedSlotToMove.room}) korundu`;
+        hint.style.color = 'var(--text-muted)';
+      }
     }
 
     function closeMoveModal() {
@@ -907,18 +966,20 @@
       if (!selectedSlotToMove) return;
       const targetDay = parseInt(document.getElementById('targetDaySelect').value);
       const targetSlot = document.getElementById('targetSlotSelect').value;
+      const targetRoom = document.getElementById('targetRoomSelect').value;
       const conflictOption = document.querySelector('input[name="conflictOption"]:checked').value;
 
       movedOverrides[selectedSlotToMove.id] = {
         targetDay: targetDay,
         targetSlot: targetSlot,
+        targetRoom: targetRoom,
         conflictMode: conflictOption,
         timestamp: new Date().toISOString()
       };
 
       saveOverrides();
       closeMoveModal();
-      selectDay(targetDay); // Taşınan güne geç ki hoca sonucu hemen görsün!
+      selectDay(targetDay); // Sonucu görmek için hedef güne geç
     }
 
     function undoMove(slotId) {
