@@ -25,6 +25,8 @@
       --amfi3: #0284c7;
       --amfi4: #d97706;
       --ofis: #059669;
+      --warning: #f59e0b;
+      --warning-bg: #fffbeb;
       --shadow: 0 4px 12px -2px rgba(0,0,0,0.06), 0 2px 6px -1px rgba(0,0,0,0.04);
     }
 
@@ -38,6 +40,7 @@
         --text-muted: #94a3b8;
         --border: #334155;
         --live-bg: #064e3b;
+        --warning-bg: #451a03;
         --shadow: 0 4px 14px rgba(0,0,0,0.3);
       }
     }
@@ -69,7 +72,7 @@
       backdrop-filter: blur(8px);
     }
 
-    /* PWA Yükleme Bildirim Çubuğu */
+    /* PWA Yükleme Banner'ı */
     .pwa-install-banner {
       display: none;
       background: linear-gradient(90deg, #1e40af, #2563eb);
@@ -92,6 +95,31 @@
       cursor: pointer;
     }
 
+    /* Değişiklik Bildirim Çubuğu */
+    .changes-banner {
+      display: none;
+      margin: 10px 16px 4px;
+      padding: 10px 14px;
+      background: var(--warning-bg);
+      border: 1px solid var(--warning);
+      border-radius: 12px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text);
+    }
+    .changes-banner button {
+      background: var(--warning);
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     /* Canlı Durum Kartı */
     .live-card {
       margin: 14px 16px 8px;
@@ -103,7 +131,6 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      transition: all 0.3s ease;
     }
     .live-tag {
       align-self: flex-start;
@@ -157,6 +184,25 @@
     }
     .day-btn .badge-cnt { font-size: 10px; opacity: 0.85; display: block; margin-top: 3px; font-weight: 500; }
 
+    /* Filtre / Görünüm Seçici */
+    .view-toggle-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 18px 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .view-select {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
     /* Ders Listesi */
     .schedule-list {
       padding: 6px 16px;
@@ -174,12 +220,49 @@
       flex-direction: column;
       gap: 8px;
       position: relative;
+      transition: all 0.2s ease;
     }
     .slot-card.current-active {
       border: 2px solid var(--live-green);
       background: var(--live-bg);
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
     }
+
+    /* SOLUK / TAŞINMIŞ DERS STİLİ */
+    .slot-card.moved-source {
+      opacity: 0.45;
+      background: rgba(0,0,0,0.02);
+      border: 1.5px dashed var(--text-muted);
+      filter: grayscale(0.5);
+    }
+    .slot-card.moved-source:hover, .slot-card.moved-source:active {
+      opacity: 0.85;
+    }
+    .moved-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #fef3c7;
+      color: #b45309;
+      width: fit-content;
+    }
+    .relocated-target-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #e0e7ff;
+      color: #3730a3;
+      width: fit-content;
+    }
+
     .slot-header {
       display: flex;
       justify-content: space-between;
@@ -217,6 +300,38 @@
       color: var(--text-muted);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       letter-spacing: 0.5px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .move-btn {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(29, 78, 216, 0.2);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .undo-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, 0.2);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* Boş Gün Bildirimi */
@@ -259,6 +374,112 @@
       color: white;
       border-color: var(--primary);
     }
+
+    /* MODAL (DERS TAŞIMA) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      backdrop-filter: blur(4px);
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .modal-title { font-size: 17px; font-weight: 800; color: var(--text); }
+    .modal-close {
+      background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; padding: 4px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .form-select, .form-input {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-save {
+      flex: 2;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-cancel {
+      flex: 1;
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -282,6 +503,12 @@
     <button onclick="installPWA()">YÜKLE</button>
   </div>
 
+  <!-- Değişiklik Bildirim Çubuğu -->
+  <div class="changes-banner" id="changesBanner">
+    <span id="changesText">⚡ Taşınmış dersleriniz var.</span>
+    <button onclick="resetAllOverrides()">Tümünü Sıfırla</button>
+  </div>
+
   <!-- Canlı Akıllı Durum Kartı -->
   <div class="live-card" id="liveCard">
     <div class="live-tag"><span class="pulse-dot"></span> <span id="liveTagTitle">DURUM KONTROLÜ</span></div>
@@ -291,11 +518,24 @@
 
   <!-- Gün Seçimi Butonları -->
   <div class="day-selector">
-    <button class="day-btn" onclick="selectDay(1)" id="btnDay1">Pzt <span class="badge-cnt">8s + Dan</span></button>
-    <button class="day-btn" onclick="selectDay(2)" id="btnDay2">Sal <span class="badge-cnt">Boş</span></button>
-    <button class="day-btn" onclick="selectDay(3)" id="btnDay3">Çar <span class="badge-cnt">10s + Dan</span></button>
-    <button class="day-btn" onclick="selectDay(4)" id="btnDay4">Per <span class="badge-cnt">4s</span></button>
-    <button class="day-btn" onclick="selectDay(5)" id="btnDay5">Cum <span class="badge-cnt">3s</span></button>
+    <button class="day-btn" onclick="selectDay(1)" id="btnDay1">Pzt <span class="badge-cnt" id="cnt1">8s + Dan</span></button>
+    <button class="day-btn" onclick="selectDay(2)" id="btnDay2">Sal <span class="badge-cnt" id="cnt2">Boş</span></button>
+    <button class="day-btn" onclick="selectDay(3)" id="btnDay3">Çar <span class="badge-cnt" id="cnt3">10s + Dan</span></button>
+    <button class="day-btn" onclick="selectDay(4)" id="btnDay4">Per <span class="badge-cnt" id="cnt4">4s</span></button>
+    <button class="day-btn" onclick="selectDay(5)" id="btnDay5">Cum <span class="badge-cnt" id="cnt5">3s</span></button>
+  </div>
+
+  <!-- Görünüm Seçenekleri -->
+  <div class="view-toggle-bar">
+    <span id="daySummaryText">Ders Akışı</span>
+    <label style="display:flex; align-items:center; gap:6px;">
+      Görünüm:
+      <select class="view-select" id="conflictFilter" onchange="renderSlots()">
+        <option value="all">Her İkisini Göster (Taşınan + Mevcut)</option>
+        <option value="onlyMoved">Sadece Taşınanı Göster</option>
+        <option value="onlyOriginal">Sadece Orijinali Göster</option>
+      </select>
+    </label>
   </div>
 
   <!-- Seçilen Günün Ders Kartları -->
@@ -307,13 +547,76 @@
     <button class="action-btn" onclick="goToday()">📍 Bugüne Odaklan</button>
   </div>
 
+  <!-- DERS TAŞIMA MODAL PENCERESİ -->
+  <div class="modal-overlay" id="moveModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⚡ Dersi Taşı / Telafi Ayarla</div>
+        <button class="modal-close" onclick="closeMoveModal()">&times;</button>
+      </div>
+
+      <div style="font-size:14px; font-weight:700; color:var(--primary);" id="modalCourseInfo">Ders Bilgisi</div>
+
+      <div class="form-group">
+        <label class="form-label">Hangi Güne Taşınsın?</label>
+        <select class="form-select" id="targetDaySelect">
+          <option value="1">Pazartesi</option>
+          <option value="2">Salı</option>
+          <option value="3">Çarşamba</option>
+          <option value="4">Perşembe</option>
+          <option value="5">Cuma</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hangi Saate Taşınsın?</label>
+        <select class="form-select" id="targetSlotSelect">
+          <option value="08:15-09:00">1. Ders (08:15 - 09:00)</option>
+          <option value="09:15-10:00">2. Ders (09:15 - 10:00)</option>
+          <option value="10:15-11:00">3. Ders (10:15 - 11:00)</option>
+          <option value="11:15-12:00">4. Ders (11:15 - 12:00)</option>
+          <option value="12:00-13:00">Öğle / Danışmanlık (12:00 - 13:00)</option>
+          <option value="13:15-14:00">5. Ders (13:15 - 14:00)</option>
+          <option value="14:15-15:00">6. Ders (14:15 - 15:00)</option>
+          <option value="15:15-16:00">7. Ders (15:15 - 16:00)</option>
+          <option value="16:10-16:55">8. Ders (16:10 - 16:55)</option>
+          <option value="17:00-17:45">9. Ders (17:00 - 17:45)</option>
+          <option value="18:00-18:45">10. Ders (18:00 - 18:45)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hedef Saatte Başka Ders Varsa:</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="conflictOption" value="both" checked>
+            <span><b>İkisi Birlikte Görünsün</b> (Örn: Çakışma / Ortak Telafi)</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="conflictOption" value="replace">
+            <span><b>Diğer Ders Gizlensin</b> (Sadece taşınan görünsün)</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="font-size:12px; color:var(--text-muted); background:var(--bg); padding:10px; border-radius:10px;">
+        💡 <b>Not:</b> Taşınan dersin orijinal günündeki saati silinmez; tam istediğiniz gibi <b>soluk</b> görünür ve üzerinde taşındığı saat yazar.
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-save" onclick="applyCourseMove()">Kaydet ve Taşı</button>
+        <button class="btn-cancel" onclick="closeMoveModal()">Vazgeç</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // 1. Service Worker Kaydı (PWA Çevrimdışı Çalışma)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker Kayıt Başarılı:', reg.scope))
-          .catch(err => console.log('Service Worker Hatası:', err));
+          .then(reg => console.log('SW Başarılı:', reg.scope))
+          .catch(err => console.log('SW Hatası:', err));
       });
     }
 
@@ -330,31 +633,28 @@
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('Kullanıcı PWA kurulumunu kabul etti');
-          }
           deferredPrompt = null;
           document.getElementById('pwaBanner').style.display = 'none';
         });
       } else {
-        alert('iPhone kullanıcıları: Ekranın altındaki "Paylaş (Kare + Yukarı Ok)" butonuna basıp "Ana Ekrana Ekle"yi seçebilir.');
+        alert('iPhone kullanıcıları: Safari Paylaş (Kare + Yukarı Ok) butonuna basıp "Ana Ekrana Ekle"yi seçebilir.');
       }
     }
 
-    // 3. Haftalık Program Veri Tabanı
-    const scheduleData = {
+    // 3. Sabit Orijinal Haftalık Program
+    const baseScheduleData = {
       1: {
         name: "Pazartesi",
         slots: [
-          { start: "08:15", end: "09:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "09:15", end: "10:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "10:15", end: "11:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "11:15", end: "12:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "12:00", end: "13:00", code: "OFİS", title: "OFİS / DANIŞMANLIK", room: "Ofis", roomClass: "room-ofis" },
-          { start: "13:15", end: "14:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
-          { start: "14:15", end: "15:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
-          { start: "15:15", end: "16:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
-          { start: "16:10", end: "16:55", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" }
+          { id: "PZT-1", start: "08:15", end: "09:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PZT-2", start: "09:15", end: "10:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PZT-3", start: "10:15", end: "11:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PZT-4", start: "11:15", end: "12:00", code: "74322301", title: "Web Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PZT-OFIS", start: "12:00", end: "13:00", code: "OFİS", title: "OFİS / DANIŞMANLIK", room: "Ofis", roomClass: "room-ofis" },
+          { id: "PZT-5", start: "13:15", end: "14:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
+          { id: "PZT-6", start: "14:15", end: "15:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
+          { id: "PZT-7", start: "15:15", end: "16:00", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" },
+          { id: "PZT-8", start: "16:10", end: "16:55", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" }
         ]
       },
       2: {
@@ -364,39 +664,68 @@
       3: {
         name: "Çarşamba",
         slots: [
-          { start: "08:15", end: "09:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "09:15", end: "10:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "10:15", end: "11:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "11:15", end: "12:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "12:00", end: "13:00", code: "OFİS", title: "OFİS / DANIŞMANLIK", room: "Ofis", roomClass: "room-ofis" },
-          { start: "13:15", end: "14:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "14:15", end: "15:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "15:15", end: "16:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "16:10", end: "16:55", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
-          { start: "17:00", end: "17:45", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
-          { start: "18:00", end: "18:45", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" }
+          { id: "CAR-1", start: "08:15", end: "09:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-2", start: "09:15", end: "10:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-3", start: "10:15", end: "11:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-4", start: "11:15", end: "12:00", code: "74192323", title: "İleri Ağ Yönetimi", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-OFIS", start: "12:00", end: "13:00", code: "OFİS", title: "OFİS / DANIŞMANLIK", room: "Ofis", roomClass: "room-ofis" },
+          { id: "CAR-5", start: "13:15", end: "14:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-6", start: "14:15", end: "15:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-7", start: "15:15", end: "16:00", code: "74191113", title: "Ağ Teknolojilerine Giriş", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "CAR-8", start: "16:10", end: "16:55", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
+          { id: "CAR-9", start: "17:00", end: "17:45", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
+          { id: "CAR-10", start: "18:00", end: "18:45", code: "74192325", title: "Sistem Analizi ve Tasarımı I", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" }
         ]
       },
       4: {
         name: "Perşembe",
         slots: [
-          { start: "08:15", end: "09:00", code: "74112309", title: "Bilgi ve Ağ Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "09:15", end: "10:00", code: "74112309", title: "Bilgi ve Ağ Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "10:15", end: "11:00", code: "74112317", title: "Kablolama", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
-          { start: "11:15", end: "12:00", code: "74112317", title: "Kablolama", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" }
+          { id: "PER-1", start: "08:15", end: "09:00", code: "74112309", title: "Bilgi ve Ağ Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PER-2", start: "09:15", end: "10:00", code: "74112309", title: "Bilgi ve Ağ Güvenliği", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PER-3", start: "10:15", end: "11:00", code: "74112317", title: "Kablolama", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" },
+          { id: "PER-4", start: "11:15", end: "12:00", code: "74112317", title: "Kablolama", room: "74 KMYO Amfi-3", roomClass: "room-amfi3" }
         ]
       },
       5: {
         name: "Cuma",
         slots: [
-          { start: "08:15", end: "09:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
-          { start: "09:15", end: "10:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
-          { start: "10:15", end: "11:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" }
+          { id: "CUM-1", start: "08:15", end: "09:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
+          { id: "CUM-2", start: "09:15", end: "10:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" },
+          { id: "CUM-3", start: "10:15", end: "11:00", code: "74192329", title: "Güvenlik Duvarı Çözümleri", room: "74 KMYO Amfi-4", roomClass: "room-amfi4" }
         ]
       }
     };
 
+    const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma" };
+
+    // 4. Dinamik Değişiklik Yönetimi (LocalStorage Destekli)
+    let movedOverrides = JSON.parse(localStorage.getItem('kmyo_moved_overrides') || '{}');
     let activeDay = 1;
+    let selectedSlotToMove = null;
+
+    function saveOverrides() {
+      localStorage.setItem('kmyo_moved_overrides', JSON.stringify(movedOverrides));
+      updateChangesBanner();
+      renderSlots();
+    }
+
+    function resetAllOverrides() {
+      if (confirm("Tüm taşınan dersler orijinal haftalık programına geri döndürülsün mü?")) {
+        movedOverrides = {};
+        saveOverrides();
+      }
+    }
+
+    function updateChangesBanner() {
+      const banner = document.getElementById('changesBanner');
+      const count = Object.keys(movedOverrides).length;
+      if (count > 0) {
+        banner.style.display = 'flex';
+        document.getElementById('changesText').innerText = `⚡ ${count} dersin saati/günü değiştirildi.`;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
 
     function init() {
       const now = new Date();
@@ -406,6 +735,7 @@
       selectDay(activeDay);
       updateClock();
       setInterval(updateClock, 1000);
+      updateChangesBanner();
     }
 
     function selectDay(dayNum) {
@@ -422,16 +752,76 @@
       selectDay(day >= 1 && day <= 5 ? day : 1);
     }
 
+    // Seçili Günün Birleşik Listesini Hazırla (Orijinal + Taşınanlar)
+    function getComputedSlotsForDay(dayNum) {
+      const baseSlots = (baseScheduleData[dayNum]?.slots || []).map(s => ({ ...s, originalDay: dayNum }));
+      const conflictFilter = document.getElementById('conflictFilter')?.value || 'all';
+      let result = [];
+
+      // 1. Orijinal slotları ekle (Taşınmışsa soluk veya gizli işaretle)
+      baseSlots.forEach(slot => {
+        const override = movedOverrides[slot.id];
+        if (override) {
+          // Bu ders başka güne taşınmış!
+          slot.isMovedSource = true;
+          slot.movedTargetDay = override.targetDay;
+          slot.movedTargetSlot = override.targetSlot;
+          slot.conflictMode = override.conflictMode;
+          result.push(slot); // Orijinal yerinde soluk kalacak
+        } else {
+          result.push(slot);
+        }
+      });
+
+      // 2. Başka günden bu güne TAŞINAN dersleri ekle
+      Object.entries(movedOverrides).forEach(([slotId, override]) => {
+        if (parseInt(override.targetDay) === dayNum) {
+          // Orijinal slotu bul
+          let origSlot = null;
+          for (let d = 1; d <= 5; d++) {
+            const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
+            if (found) { origSlot = { ...found, originalDay: d }; break; }
+          }
+          if (origSlot) {
+            const [targetS, targetE] = override.targetSlot.split('-');
+            const movedInstance = {
+              ...origSlot,
+              start: targetS,
+              end: targetE,
+              isRelocatedTarget: true,
+              fromDay: origSlot.originalDay,
+              origStart: origSlot.start,
+              origEnd: origSlot.end,
+              conflictMode: override.conflictMode,
+              overrideKey: slotId
+            };
+            result.push(movedInstance);
+          }
+        }
+      });
+
+      // Filtreleme mantığı
+      if (conflictFilter === 'onlyMoved') {
+        result = result.filter(s => s.isRelocatedTarget || s.isMovedSource);
+      } else if (conflictFilter === 'onlyOriginal') {
+        result = result.filter(s => !s.isRelocatedTarget);
+      }
+
+      // Saate göre sırala
+      result.sort((a, b) => a.start.localeCompare(b.start));
+      return result;
+    }
+
     function renderSlots() {
       const container = document.getElementById('scheduleContainer');
       container.innerHTML = '';
-      const dayInfo = scheduleData[activeDay];
+      const slots = getComputedSlotsForDay(activeDay);
 
-      if (!dayInfo.slots || dayInfo.slots.length === 0) {
+      if (slots.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <h3>🎉 Bugün Dersiniz Yok</h3>
-            <p>Salı günü programınızda tanımlı ders veya danışmanlık saati bulunmamaktadır.</p>
+            <p>${dayNames[activeDay]} günü programınızda tanımlı ders saati bulunmamaktadır.</p>
           </div>
         `;
         return;
@@ -441,29 +831,99 @@
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
       const isActualToday = (now.getDay() === activeDay);
 
-      dayInfo.slots.forEach(slot => {
+      slots.forEach(slot => {
         const [sh, sm] = slot.start.split(':').map(Number);
         const [eh, em] = slot.end.split(':').map(Number);
         const startMin = sh * 60 + sm;
         const endMin = eh * 60 + em;
 
-        const isNow = isActualToday && (currentMinutes >= startMin && currentMinutes <= endMin);
+        const isNow = isActualToday && (currentMinutes >= startMin && currentMinutes <= endMin) && !slot.isMovedSource;
 
         const card = document.createElement('div');
-        card.className = 'slot-card' + (isNow ? ' current-active' : '');
+        let cardClasses = ['slot-card'];
+        if (isNow) cardClasses.push('current-active');
+        if (slot.isMovedSource) cardClasses.push('moved-source');
+
+        card.className = cardClasses.join(' ');
+
+        let statusBadgeHtml = '';
+        if (isNow) {
+          statusBadgeHtml = '<span style="color:#10b981;font-size:11px;font-weight:700;">● ŞU AN</span>';
+        } else if (slot.isMovedSource) {
+          statusBadgeHtml = `<div class="moved-badge">⚠️ ${dayNames[slot.movedTargetDay]} ${slot.movedTargetSlot}'e taşındı (Soluk)</div>`;
+        } else if (slot.isRelocatedTarget) {
+          statusBadgeHtml = `<div class="relocated-target-badge">🔄 ${dayNames[slot.fromDay]} ${slot.origStart}'den buraya taşındı</div>`;
+        }
+
+        let actionBtnHtml = '';
+        if (slot.isMovedSource || slot.isRelocatedTarget) {
+          const keyToUndo = slot.overrideKey || slot.id;
+          actionBtnHtml = `<button class="undo-btn" onclick="undoMove('${keyToUndo}')">↩ Orijinaline Döndür</button>`;
+        } else {
+          actionBtnHtml = `<button class="move-btn" onclick="openMoveModal('${slot.id}')">⚡ Bu Dersi Taşı</button>`;
+        }
+
         card.innerHTML = `
           <div class="slot-header">
             <div class="slot-time">
               <span>⏱ ${slot.start} - ${slot.end}</span>
-              ${isNow ? '<span style="color:#10b981;font-size:11px;font-weight:700;">● ŞU AN</span>' : ''}
+              ${statusBadgeHtml}
             </div>
             <div class="slot-room ${slot.roomClass}">${slot.room}</div>
           </div>
-          <div class="course-title">${slot.title}</div>
+          <div class="course-title" style="${slot.isMovedSource ? 'text-decoration: line-through; opacity: 0.8;' : ''}">${slot.title}</div>
           <div class="course-code">${slot.code}</div>
+          <div class="card-footer">
+            <span style="font-size:11px; color:var(--text-muted);">${slot.room}</span>
+            ${actionBtnHtml}
+          </div>
         `;
         container.appendChild(card);
       });
+    }
+
+    // Modal İşlemleri
+    function openMoveModal(slotId) {
+      // Orijinal slotu bul
+      let slot = null;
+      for (let d = 1; d <= 5; d++) {
+        const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
+        if (found) { slot = { ...found, day: d }; break; }
+      }
+      if (!slot) return;
+
+      selectedSlotToMove = slot;
+      document.getElementById('modalCourseInfo').innerText = `${slot.title} (${dayNames[slot.day]} ${slot.start} - ${slot.end})`;
+      document.getElementById('targetDaySelect').value = slot.day === 5 ? 1 : slot.day + 1; // Bir sonraki gün öner
+      document.getElementById('moveModal').classList.add('active');
+    }
+
+    function closeMoveModal() {
+      document.getElementById('moveModal').classList.remove('active');
+      selectedSlotToMove = null;
+    }
+
+    function applyCourseMove() {
+      if (!selectedSlotToMove) return;
+      const targetDay = parseInt(document.getElementById('targetDaySelect').value);
+      const targetSlot = document.getElementById('targetSlotSelect').value;
+      const conflictOption = document.querySelector('input[name="conflictOption"]:checked').value;
+
+      movedOverrides[selectedSlotToMove.id] = {
+        targetDay: targetDay,
+        targetSlot: targetSlot,
+        conflictMode: conflictOption,
+        timestamp: new Date().toISOString()
+      };
+
+      saveOverrides();
+      closeMoveModal();
+      selectDay(targetDay); // Taşınan güne geç ki hoca sonucu hemen görsün!
+    }
+
+    function undoMove(slotId) {
+      delete movedOverrides[slotId];
+      saveOverrides();
     }
 
     function updateClock() {
@@ -490,8 +950,8 @@
         return;
       }
 
-      const todayData = scheduleData[currentDay];
-      if (!todayData || todayData.slots.length === 0) {
+      const todaySlots = getComputedSlotsForDay(currentDay).filter(s => !s.isMovedSource);
+      if (todaySlots.length === 0) {
         liveTagTitle.innerText = "SERBEST GÜN";
         liveStatusText.innerText = "Bugün programınızda ders bulunmuyor.";
         liveSubText.innerText = "Akademik ve idari çalışma günü.";
@@ -501,7 +961,7 @@
       let currentSlot = null;
       let nextSlot = null;
 
-      for (const slot of todayData.slots) {
+      for (const slot of todaySlots) {
         const [sh, sm] = slot.start.split(':').map(Number);
         const [eh, em] = slot.end.split(':').map(Number);
         const s = sh * 60 + sm;
@@ -539,12 +999,14 @@
         "METHOD:PUBLISH"
       ];
 
-      const dayOffsetMap = { 1: "MO", 3: "WE", 4: "TH", 5: "FR" };
-      for (const [dayNum, day] of Object.entries(scheduleData)) {
-        if (!day.slots || day.slots.length === 0) continue;
+      const dayOffsetMap = { 1: "MO", 2: "TU", 3: "WE", 4: "TH", 5: "FR" };
+      
+      for (let dayNum = 1; dayNum <= 5; dayNum++) {
+        const slots = getComputedSlotsForDay(dayNum).filter(s => !s.isMovedSource);
+        if (slots.length === 0) continue;
         const rruleDay = dayOffsetMap[dayNum];
-        
-        day.slots.forEach((slot, idx) => {
+
+        slots.forEach((slot, idx) => {
           const sHour = slot.start.replace(':', '') + "00";
           const eHour = slot.end.replace(':', '') + "00";
           icsContent.push(
@@ -571,7 +1033,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Fatih_Akman_Cakmak_Ders_Programi.ics";
+      a.download = "Fatih_Akman_Cakmak_Guncel_Ders_Programi.ics";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
