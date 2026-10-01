@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e3a8a">
-  <title>KMYO Ders ve Danışmanlık Programı - Öğr. Gör. Fatih Akman ÇAKMAK</title>
+  <title>KMYO Ders, Danışmanlık ve Toplantı Programı - Öğr. Gör. Fatih Akman ÇAKMAK</title>
   <style>
     :root {
       --primary: #1d4ed8;
@@ -26,6 +26,8 @@
       --amfi3: #0284c7;
       --amfi4: #d97706;
       --ofis: #059669;
+      --meeting-color: #8b5cf6;
+      --meeting-bg: #f5f3ff;
       --warning: #f59e0b;
       --warning-bg: #fffbeb;
       --shadow: 0 4px 12px -2px rgba(0,0,0,0.06), 0 2px 6px -1px rgba(0,0,0,0.04);
@@ -42,6 +44,7 @@
         --border: #334155;
         --live-bg: #064e3b;
         --warning-bg: #451a03;
+        --meeting-bg: #2e1065;
         --shadow: 0 4px 14px rgba(0,0,0,0.3);
       }
     }
@@ -53,7 +56,7 @@
     .header {
       background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%);
       color: white;
-      padding: 22px 18px 18px;
+      padding: 20px 18px 16px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -65,12 +68,53 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 13px;
       background: rgba(255,255,255,0.14);
       padding: 7px 14px;
       border-radius: 20px;
       backdrop-filter: blur(8px);
+    }
+
+    /* Ana Mod Sekmeleri (Ders Programı / Toplantılar) */
+    .main-nav-tabs {
+      display: flex;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 16px 0;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .main-tab-btn {
+      flex: 1;
+      padding: 12px 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .main-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .tab-counter {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .tab-counter.alert-counter {
+      background: #fee2e2;
+      color: #b91c1c;
     }
 
     /* PWA Yükleme Banner'ı */
@@ -95,6 +139,36 @@
       font-size: 12px;
       cursor: pointer;
     }
+
+    /* Yaklaşan Toplantı Banner'ı (Ders programında 2 gün önceden görünen) */
+    .meeting-reminder-banner {
+      display: none;
+      margin: 12px 16px 4px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.28);
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+    .meeting-reminder-banner.active { display: flex; }
+    .mrb-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.2);
+      padding: 3px 8px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .mrb-title { font-size: 16px; font-weight: 800; }
+    .mrb-details { font-size: 13px; opacity: 0.95; display: flex; gap: 12px; flex-wrap: wrap; }
 
     /* Değişiklik Bildirim Çubuğu */
     .changes-banner {
@@ -229,6 +303,13 @@
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
     }
 
+    /* TOPLANTI KARTI STİLİ (Ders programı içine düştüğünde) */
+    .slot-card.meeting-slot-card {
+      border: 2px solid var(--meeting-color);
+      background: var(--meeting-bg);
+      box-shadow: 0 6px 18px rgba(139, 92, 246, 0.15);
+    }
+
     /* SOLUK / TAŞINMIŞ DERS STİLİ */
     .slot-card.moved-source {
       opacity: 0.45;
@@ -290,6 +371,7 @@
     .room-amfi3 { background-color: var(--amfi3); }
     .room-amfi4 { background-color: var(--amfi4); }
     .room-ofis { background-color: var(--ofis); }
+    .room-meeting { background-color: var(--meeting-color); }
 
     .course-title {
       font-size: 16px;
@@ -332,6 +414,122 @@
       padding: 4px 10px;
       border-radius: 8px;
       font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* TOPLANTILAR SEKMESİ ARAYÜZÜ */
+    .meetings-view {
+      display: none;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .meetings-view.active { display: flex; }
+
+    .meeting-form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mfc-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .form-input, .form-select {
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+    .btn-add-meeting {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .meeting-item-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+    .meeting-item-card.past-meeting {
+      opacity: 0.6;
+      background: rgba(0,0,0,0.02);
+    }
+    .mic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mic-time {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .mic-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .mic-loc {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-delete-meeting {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, 0.2);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
     }
@@ -382,15 +580,13 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.55);
       z-index: 200;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
       align-items: flex-end;
       justify-content: center;
     }
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
     .modal-content {
       background: var(--card-bg);
       width: 100%;
@@ -403,10 +599,7 @@
       box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
       animation: slideUp 0.25s ease-out;
     }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-header {
       display: flex;
       justify-content: space-between;
@@ -415,29 +608,8 @@
       padding-bottom: 12px;
     }
     .modal-title { font-size: 17px; font-weight: 800; color: var(--text); }
-    .modal-close {
-      background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; padding: 4px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .form-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .form-select {
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-      outline: none;
-    }
+    .modal-close { background: none; border: none; font-size: 22px; color: var(--text-muted); cursor: pointer; padding: 4px; }
+
     .radio-group {
       display: flex;
       flex-direction: column;
@@ -455,11 +627,7 @@
       color: var(--text);
       cursor: pointer;
     }
-    .modal-btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
+    .modal-btn-row { display: flex; gap: 10px; margin-top: 6px; }
     .btn-save {
       flex: 2;
       background: var(--primary);
@@ -482,6 +650,114 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    /* BÜYÜK TOPLANTI UYARI MODALI (1 GÜN ÖNCE 22:00'DE ÇIKAN) */
+    .big-alert-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 9999;
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .big-alert-overlay.active { display: flex; }
+    .big-alert-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 24px;
+      border: 3px solid var(--primary);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      padding: 26px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .big-alert-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #eff6ff;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto;
+      border: 3px solid #bfdbfe;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .big-alert-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: #dc2626;
+      background: #fee2e2;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      margin: 0 auto;
+      letter-spacing: 0.5px;
+    }
+    .big-alert-meeting-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .big-alert-details-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 14px;
+      text-align: left;
+    }
+    .bad-row { display: flex; justify-content: space-between; font-weight: 600; }
+    .bad-label { color: var(--text-muted); font-size: 13px; }
+    .bad-val { color: var(--text); font-weight: 700; }
+    .snooze-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+    .btn-snooze-action {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-dismiss-alert {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -496,6 +772,16 @@
     </div>
   </div>
 
+  <!-- Ana Mod Sekmeleri: [Ders Programı] | [Toplantılar (N)] -->
+  <div class="main-nav-tabs">
+    <button class="main-tab-btn active" id="tabNavSchedule" onclick="switchMainView('schedule')">
+      📚 Haftalık Program
+    </button>
+    <button class="main-tab-btn" id="tabNavMeetings" onclick="switchMainView('meetings')">
+      🏛️ Toplantılar <span class="tab-counter" id="meetingBadgeCnt">0</span>
+    </button>
+  </div>
+
   <!-- PWA Yükleme Banner'ı -->
   <div class="pwa-install-banner" id="pwaBanner">
     <div>
@@ -505,48 +791,105 @@
     <button onclick="installPWA()">YÜKLE</button>
   </div>
 
-  <!-- Değişiklik Bildirim Çubuğu -->
+  <!-- Yaklaşan Toplantı Bildirim Çubuğu (Ders programında 2 gün önceden görünen) -->
+  <div class="meeting-reminder-banner" id="meetingReminderBanner">
+    <div class="mrb-tag">⏰ YAKLAŞAN TOPLANTI HATIRLATMASI</div>
+    <div class="mrb-title" id="mrbTitle">Toplantı Başlığı</div>
+    <div class="mrb-details">
+      <span id="mrbDate">📅 Tarih</span>
+      <span id="mrbTime">⏱ Saat</span>
+      <span id="mrbLoc">📍 Yer</span>
+    </div>
+  </div>
+
+  <!-- Değişiklik Bildirim Çubuğu (Taşınan dersler için) -->
   <div class="changes-banner" id="changesBanner">
     <span id="changesText">⚡ Taşınmış dersleriniz var.</span>
     <button onclick="resetAllOverrides()">Tümünü Sıfırla</button>
   </div>
 
-  <!-- Canlı Akıllı Durum Kartı -->
-  <div class="live-card" id="liveCard">
-    <div class="live-tag"><span class="pulse-dot"></span> <span id="liveTagTitle">DURUM KONTROLÜ</span></div>
-    <div id="liveStatusText" style="font-size: 16px; font-weight: 700; color: var(--text);">Program yükleniyor...</div>
-    <div id="liveSubText" style="font-size: 13px; color: var(--text-muted);"></div>
+  <!-- ==================== GÖRÜNÜM 1: DERS PROGRAMI ==================== -->
+  <div id="viewSchedule">
+    <!-- Canlı Akıllı Durum Kartı -->
+    <div class="live-card" id="liveCard">
+      <div class="live-tag"><span class="pulse-dot"></span> <span id="liveTagTitle">DURUM KONTROLÜ</span></div>
+      <div id="liveStatusText" style="font-size: 16px; font-weight: 700; color: var(--text);">Program yükleniyor...</div>
+      <div id="liveSubText" style="font-size: 13px; color: var(--text-muted);"></div>
+    </div>
+
+    <!-- Gün Seçimi Butonları -->
+    <div class="day-selector">
+      <button class="day-btn" onclick="selectDay(1)" id="btnDay1">Pzt <span class="badge-cnt" id="cnt1">8s + Dan</span></button>
+      <button class="day-btn" onclick="selectDay(2)" id="btnDay2">Sal <span class="badge-cnt" id="cnt2">Boş</span></button>
+      <button class="day-btn" onclick="selectDay(3)" id="btnDay3">Çar <span class="badge-cnt" id="cnt3">10s + Dan</span></button>
+      <button class="day-btn" onclick="selectDay(4)" id="btnDay4">Per <span class="badge-cnt" id="cnt4">4s</span></button>
+      <button class="day-btn" onclick="selectDay(5)" id="btnDay5">Cum <span class="badge-cnt" id="cnt5">3s</span></button>
+    </div>
+
+    <!-- Görünüm Seçenekleri -->
+    <div class="view-toggle-bar">
+      <span id="daySummaryText">Ders Akışı</span>
+      <label style="display:flex; align-items:center; gap:6px;">
+        Görünüm:
+        <select class="view-select" id="conflictFilter" onchange="renderSlots()">
+          <option value="all">Her İkisini Göster (Taşınan + Mevcut)</option>
+          <option value="onlyMoved">Sadece Taşınanı Göster</option>
+          <option value="onlyOriginal">Sadece Orijinali Göster</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Seçilen Günün Ders Kartları -->
+    <div class="schedule-list" id="scheduleContainer"></div>
+
+    <!-- Alt Butonlar -->
+    <div class="action-bar">
+      <button class="action-btn primary-btn" onclick="exportToCalendar()">📅 Takvime Aktar (.ics)</button>
+      <button class="action-btn" onclick="goToday()">📍 Bugüne Odaklan</button>
+    </div>
   </div>
 
-  <!-- Gün Seçimi Butonları -->
-  <div class="day-selector">
-    <button class="day-btn" onclick="selectDay(1)" id="btnDay1">Pzt <span class="badge-cnt" id="cnt1">8s + Dan</span></button>
-    <button class="day-btn" onclick="selectDay(2)" id="btnDay2">Sal <span class="badge-cnt" id="cnt2">Boş</span></button>
-    <button class="day-btn" onclick="selectDay(3)" id="btnDay3">Çar <span class="badge-cnt" id="cnt3">10s + Dan</span></button>
-    <button class="day-btn" onclick="selectDay(4)" id="btnDay4">Per <span class="badge-cnt" id="cnt4">4s</span></button>
-    <button class="day-btn" onclick="selectDay(5)" id="btnDay5">Cum <span class="badge-cnt" id="cnt5">3s</span></button>
-  </div>
+  <!-- ==================== GÖRÜNÜM 2: TOPLANTILAR SEKMESİ ==================== -->
+  <div class="meetings-view" id="viewMeetings">
+    <!-- Toplantı Ekleme Formu -->
+    <div class="meeting-form-card">
+      <div class="mfc-title">➕ Yeni Toplantı Ekle</div>
+      
+      <div class="form-group">
+        <label class="form-label">Toplantı Konusu / Başlığı *</label>
+        <input type="text" class="form-input" id="inpMeetingTitle" placeholder="Örn: Bölüm Kurulu / Akademik Kurul">
+      </div>
 
-  <!-- Görünüm Seçenekleri -->
-  <div class="view-toggle-bar">
-    <span id="daySummaryText">Ders Akışı</span>
-    <label style="display:flex; align-items:center; gap:6px;">
-      Görünüm:
-      <select class="view-select" id="conflictFilter" onchange="renderSlots()">
-        <option value="all">Her İkisini Göster (Taşınan + Mevcut)</option>
-        <option value="onlyMoved">Sadece Taşınanı Göster</option>
-        <option value="onlyOriginal">Sadece Orijinali Göster</option>
-      </select>
-    </label>
-  </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tarih *</label>
+          <input type="date" class="form-input" id="inpMeetingDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Yer / Amfi</label>
+          <input type="text" class="form-input" id="inpMeetingLocation" placeholder="Toplantı Salonu / Amfi-1">
+        </div>
+      </div>
 
-  <!-- Seçilen Günün Ders Kartları -->
-  <div class="schedule-list" id="scheduleContainer"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Başlangıç Saati *</label>
+          <input type="time" class="form-input" id="inpMeetingStart" value="14:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bitiş Saati *</label>
+          <input type="time" class="form-input" id="inpMeetingEnd" value="15:30">
+        </div>
+      </div>
 
-  <!-- Alt Butonlar -->
-  <div class="action-bar">
-    <button class="action-btn primary-btn" onclick="exportToCalendar()">📅 Takvime Aktar (.ics)</button>
-    <button class="action-btn" onclick="goToday()">📍 Bugüne Odaklan</button>
+      <button class="btn-add-meeting" onclick="saveNewMeeting()">💾 Toplantıyı Kaydet</button>
+    </div>
+
+    <!-- Aktif / Yaklaşan Toplantılar -->
+    <div style="font-size:15px; font-weight:800; color:var(--text); margin-top:6px;">
+      📌 Kayıtlı Toplantılarım
+    </div>
+    <div id="meetingsListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
   </div>
 
   <!-- DERS TAŞIMA MODAL PENCERESİ -->
@@ -616,14 +959,57 @@
         </div>
       </div>
 
-      <div style="font-size:12px; color:var(--text-muted); background:var(--bg); padding:10px; border-radius:10px;">
-        💡 <b>Kural:</b> Taşınan ders hedef saatte başka bir dersle buluştuğunda sınıf otomatik olarak o dersin sınıfı yapılır. Dilerseniz yukarıdaki menüden <b>Amfi 1, 2, 3 veya 4</b> olarak değiştirebilirsiniz. Orijinal gününde ise ders silinmeyip <b>soluk</b> kalır.
-      </div>
-
       <div class="modal-btn-row">
         <button class="btn-save" onclick="applyCourseMove()">Kaydet ve Taşı</button>
         <button class="btn-cancel" onclick="closeMoveModal()">Vazgeç</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== BÜYÜK TOPLANTI UYARI PENCERESİ (1 GÜN ÖNCE 22:00) ==================== -->
+  <div class="big-alert-overlay" id="bigMeetingAlertModal">
+    <div class="big-alert-card">
+      <div class="big-alert-icon">📢</div>
+      <div class="big-alert-tag">🚨 ÖNEMLİ TOPLANTI HATIRLATMASI</div>
+      <div class="big-alert-meeting-title" id="bamTitle">Toplantı Başlığı</div>
+      
+      <div class="big-alert-details-box">
+        <div class="bad-row">
+          <span class="bad-label">📅 Tarih:</span>
+          <span class="bad-val" id="bamDate">-</span>
+        </div>
+        <div class="bad-row">
+          <span class="bad-label">⏱ Saat:</span>
+          <span class="bad-val" id="bamTime">-</span>
+        </div>
+        <div class="bad-row">
+          <span class="bad-label">📍 Yer:</span>
+          <span class="bad-val" id="bamLoc">-</span>
+        </div>
+        <div class="bad-row" style="margin-top:4px; padding-top:6px; border-top:1px dashed var(--border);">
+          <span class="bad-label">⏳ Durum:</span>
+          <span class="bad-val" id="bamCountdown" style="color:#dc2626;">-</span>
+        </div>
+      </div>
+
+      <!-- Erteleme Seçenekleri -->
+      <div class="snooze-box">
+        <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Uyarısı Ertele:</label>
+        <div style="display:flex; gap:8px;">
+          <select class="form-select" id="snoozeHoursSelect" style="flex:1;">
+            <option value="1">1 Saat Ertele</option>
+            <option value="2">2 Saat Ertele</option>
+            <option value="4">4 Saat Ertele</option>
+            <option value="8">8 Saat Ertele</option>
+            <option value="12">12 Saat Ertele</option>
+            <option value="24">24 Saat Ertele</option>
+          </select>
+          <button class="btn-snooze-action" style="flex:1;" onclick="snoozeCurrentBigAlert()">⏰ Ertele</button>
+        </div>
+      </div>
+
+      <!-- Uyarısı Kapat / Bir Daha Gösterme -->
+      <button class="btn-dismiss-alert" onclick="dismissCurrentBigAlert()">🔕 Bu Uyarısı Kapat (Bir daha gelmesin)</button>
     </div>
   </div>
 
@@ -649,16 +1035,16 @@
     function installPWA() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt.userChoice.then(() => {
           deferredPrompt = null;
           document.getElementById('pwaBanner').style.display = 'none';
         });
       } else {
-        alert('iPhone kullanıcıları: Safari Paylaş (Kare + Yukarı Ok) butonuna basıp "Ana Ekrana Ekle"yi seçebilir.');
+        alert('iPhone: Safari Paylaş (Kare + Yukarı Ok) butonuna basıp "Ana Ekrana Ekle"yi seçebilirsiniz.');
       }
     }
 
-    // 3. Sabit Orijinal Haftalık Program
+    // 3. Sabit Orijinal Haftalık Ders Programı
     const baseScheduleData = {
       1: {
         name: "Pazartesi",
@@ -674,10 +1060,7 @@
           { id: "PZT-8", start: "16:10", end: "16:55", code: "74112335", title: "Yönlendiriciler I", room: "74 KMYO Amfi-2", roomClass: "room-amfi2" }
         ]
       },
-      2: {
-        name: "Salı",
-        slots: []
-      },
+      2: { name: "Salı", slots: [] },
       3: {
         name: "Çarşamba",
         slots: [
@@ -722,13 +1105,16 @@
       if (roomName.includes('Amfi-3')) return 'room-amfi3';
       if (roomName.includes('Amfi-4')) return 'room-amfi4';
       if (roomName.includes('Ofis')) return 'room-ofis';
+      if (roomName.includes('Toplantı') || roomName.includes('Müdür')) return 'room-meeting';
       return 'room-amfi3';
     }
 
-    // 4. Dinamik Değişiklik Yönetimi (LocalStorage Destekli)
+    // 4. Veri Yönetimi (LocalStorage)
     let movedOverrides = JSON.parse(localStorage.getItem('kmyo_moved_overrides') || '{}');
+    let meetings = JSON.parse(localStorage.getItem('kmyo_meetings') || '[]');
     let activeDay = 1;
     let selectedSlotToMove = null;
+    let currentActiveBigAlertMeeting = null;
 
     function saveOverrides() {
       localStorage.setItem('kmyo_moved_overrides', JSON.stringify(movedOverrides));
@@ -736,56 +1122,272 @@
       renderSlots();
     }
 
-    function resetAllOverrides() {
-      if (confirm("Tüm taşınan dersler orijinal haftalık programına geri döndürülsün mü?")) {
-        movedOverrides = {};
-        saveOverrides();
+    function saveMeetings() {
+      localStorage.setItem('kmyo_meetings', JSON.stringify(meetings));
+      updateMeetingsBadge();
+      renderMeetingsList();
+      checkMeetingVisibilityInSchedule();
+      checkBigMeetingAlert();
+    }
+
+    function updateMeetingsBadge() {
+      const activeCount = meetings.filter(m => !isMeetingExpired(m)).length;
+      const badge = document.getElementById('meetingBadgeCnt');
+      if (badge) {
+        badge.innerText = activeCount;
+        badge.classList.toggle('alert-counter', activeCount > 0);
       }
     }
 
-    function updateChangesBanner() {
-      const banner = document.getElementById('changesBanner');
-      const count = Object.keys(movedOverrides).length;
-      if (count > 0) {
-        banner.style.display = 'flex';
-        document.getElementById('changesText').innerText = `⚡ ${count} dersin saati/sınıfı değiştirildi.`;
+    function switchMainView(viewName) {
+      const scheduleView = document.getElementById('viewSchedule');
+      const meetingsView = document.getElementById('viewMeetings');
+      const tabSched = document.getElementById('tabNavSchedule');
+      const tabMeet = document.getElementById('tabNavMeetings');
+
+      if (viewName === 'meetings') {
+        scheduleView.style.display = 'none';
+        meetingsView.classList.add('active');
+        tabSched.classList.remove('active');
+        tabMeet.classList.add('active');
+        renderMeetingsList();
       } else {
-        banner.style.display = 'none';
+        meetingsView.classList.remove('active');
+        scheduleView.style.display = 'block';
+        tabMeet.classList.remove('active');
+        tabSched.classList.add('active');
+        renderSlots();
       }
     }
 
-    function init() {
+    // ==================== TOPLANTI YÖNETİMİ MANTIĞI ====================
+
+    function isMeetingExpired(meeting) {
       const now = new Date();
-      let dayIndex = now.getDay();
-      if (dayIndex < 1 || dayIndex > 5) dayIndex = 1;
-      activeDay = dayIndex;
-      selectDay(activeDay);
-      updateClock();
-      setInterval(updateClock, 1000);
-      updateChangesBanner();
+      const [y, m, d] = meeting.date.split('-').map(Number);
+      const [eh, em] = meeting.endTime.split(':').map(Number);
+      const endDt = new Date(y, m - 1, d, eh, em, 0);
+      return now > endDt;
     }
 
-    function selectDay(dayNum) {
-      activeDay = dayNum;
-      for (let i = 1; i <= 5; i++) {
-        const btn = document.getElementById('btnDay' + i);
-        if (btn) btn.classList.toggle('active', i === dayNum);
+    function saveNewMeeting() {
+      const title = document.getElementById('inpMeetingTitle').value.trim();
+      const date = document.getElementById('inpMeetingDate').value;
+      const startTime = document.getElementById('inpMeetingStart').value;
+      const endTime = document.getElementById('inpMeetingEnd').value;
+      const location = document.getElementById('inpMeetingLocation').value.trim() || 'Toplantı Salonu';
+
+      if (!title || !date || !startTime || !endTime) {
+        alert('Lütfen toplantı başlığı, tarih, başlangıç ve bitiş saatlerini eksiksiz girin.');
+        return;
       }
-      renderSlots();
+
+      const newMeeting = {
+        id: 'meet_' + Date.now(),
+        title: title,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        location: location,
+        alertDismissed: false,
+        snoozeUntil: null,
+        createdAt: new Date().toISOString()
+      };
+
+      meetings.push(newMeeting);
+      saveMeetings();
+
+      // Formu temizle
+      document.getElementById('inpMeetingTitle').value = '';
+      document.getElementById('inpMeetingLocation').value = '';
+
+      alert('Toplantı başarıyla kaydedildi! 2 gün önceden ders programında görünmeye başlayacak.');
     }
 
-    function goToday() {
-      const day = new Date().getDay();
-      selectDay(day >= 1 && day <= 5 ? day : 1);
+    function deleteMeeting(id) {
+      if (confirm('Bu toplantı kaydını silmek istediğinize emin misiniz?')) {
+        meetings = meetings.filter(m => m.id !== id);
+        saveMeetings();
+      }
     }
 
-    // Seçili Günün Birleşik Listesini Hazırla (Orijinal + Taşınanlar)
+    function renderMeetingsList() {
+      const container = document.getElementById('meetingsListContainer');
+      container.innerHTML = '';
+
+      if (meetings.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding:30px;">
+            <h3>Henüz Kayıtlı Toplantı Yok</h3>
+            <p>Yukarıdaki formu kullanarak yaklaşan toplantılarınızı ekleyebilirsiniz.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Tarihe göre sırala
+      meetings.sort((a, b) => (a.date + ' ' + a.startTime).localeCompare(b.date + ' ' + b.startTime));
+
+      meetings.forEach(m => {
+        const expired = isMeetingExpired(m);
+        const card = document.createElement('div');
+        card.className = 'meeting-item-card' + (expired ? ' past-meeting' : '');
+
+        const [y, mo, d] = m.date.split('-');
+        const dateStr = `${d}.${mo}.${y}`;
+
+        card.innerHTML = `
+          <div class="mic-header">
+            <span class="mic-time">⏱ ${m.startTime} - ${m.endTime}</span>
+            <span style="font-size:12px; font-weight:700; color:${expired ? 'var(--text-muted)' : 'var(--primary)'}">
+              ${dateStr} ${expired ? '(Tamamlandı)' : '• Aktif'}
+            </span>
+          </div>
+          <div class="mic-title">🏛️ ${m.title}</div>
+          <div class="mic-loc">📍 Yer: <b>${m.location}</b></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--border); padding-top:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">
+              ${m.alertDismissed ? '🔕 Uyarı Kapatıldı' : (m.snoozeUntil ? '⏰ Ertelendi' : '🔔 22:00 Alarmı Aktif')}
+            </span>
+            <button class="btn-delete-meeting" onclick="deleteMeeting('${m.id}')">🗑️ Sil</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ==================== 2 GÜN ÖNCEDEN DERS PROGRAMINDA GÖRÜNME ====================
+
+    function checkMeetingVisibilityInSchedule() {
+      const banner = document.getElementById('meetingReminderBanner');
+      const now = new Date();
+
+      // Gelecek ve günü gelmeden en fazla 2 gün önce olan İLK toplantıyı bul
+      let upcomingMeeting = null;
+      let minDiffMs = Infinity;
+
+      meetings.forEach(m => {
+        if (isMeetingExpired(m)) return; // Bitişten sonra kalksın kuralı!
+
+        const [y, mo, d] = m.date.split('-').map(Number);
+        const [sh, sm] = m.startTime.split(':').map(Number);
+        const startDt = new Date(y, mo - 1, d, sh, sm, 0);
+
+        // 2 gün öncesinin başlangıcı (00:00)
+        const twoDaysBeforeDt = new Date(y, mo - 1, d - 2, 0, 0, 0);
+
+        if (now >= twoDaysBeforeDt && now <= startDt) {
+          const diff = startDt - now;
+          if (diff < minDiffMs) {
+            minDiffMs = diff;
+            upcomingMeeting = { ...m, startDt };
+          }
+        }
+      });
+
+      if (upcomingMeeting) {
+        banner.classList.add('active');
+        document.getElementById('mrbTitle').innerText = upcomingMeeting.title;
+        document.getElementById('mrbDate').innerText = '📅 ' + upcomingMeeting.date;
+        document.getElementById('mrbTime').innerText = `⏱ ${upcomingMeeting.startTime} - ${upcomingMeeting.endTime}`;
+        document.getElementById('mrbLoc').innerText = '📍 ' + upcomingMeeting.location;
+      } else {
+        banner.classList.remove('active');
+      }
+    }
+
+    // ==================== 1 GÜN ÖNCE SAAT 22:00 BÜYÜK EKRAN UYARISI ====================
+
+    function checkBigMeetingAlert() {
+      const now = new Date();
+
+      for (const m of meetings) {
+        if (m.alertDismissed) continue; // "Sil/kapat dediğimde bir daha gelmesin"
+        if (isMeetingExpired(m)) continue; // Bitişten sonra kalksın
+
+        // Ertelenmişse süresini bekle
+        if (m.snoozeUntil && now < new Date(m.snoozeUntil)) continue;
+
+        const [y, mo, d] = m.date.split('-').map(Number);
+        const [sh, sm] = m.startTime.split(':').map(Number);
+        const [eh, em] = m.endTime.split(':').map(Number);
+
+        // 1 gün önce saat 22:00 tetiklenme zamanı
+        const alertTriggerDt = new Date(y, mo - 1, d - 1, 22, 0, 0);
+        const meetingEndDt = new Date(y, mo - 1, d, eh, em, 0);
+
+        // Eğer şu an 1 gün önceki 22:00'den büyük veya eşitse ve toplantı henüz bitmediyse
+        if (now >= alertTriggerDt && now <= meetingEndDt) {
+          triggerBigAlert(m);
+          break; // Aynı anda 1 büyük alert göster
+        }
+      }
+    }
+
+    function triggerBigAlert(meeting) {
+      currentActiveBigAlertMeeting = meeting;
+      const modal = document.getElementById('bigMeetingAlertModal');
+      document.getElementById('bamTitle').innerText = meeting.title;
+      document.getElementById('bamDate').innerText = meeting.date;
+      document.getElementById('bamTime').innerText = `${meeting.startTime} - ${meeting.endTime}`;
+      document.getElementById('bamLoc').innerText = meeting.location;
+
+      const [y, mo, d] = meeting.date.split('-').map(Number);
+      const [sh, sm] = meeting.startTime.split(':').map(Number);
+      const startDt = new Date(y, mo - 1, d, sh, sm, 0);
+      const diffMin = Math.round((startDt - new Date()) / 60000);
+
+      let remainText = '';
+      if (diffMin > 60) {
+        const hours = Math.floor(diffMin / 60);
+        const mins = diffMin % 60;
+        remainText = `${hours} saat ${mins} dakika kaldı`;
+      } else if (diffMin > 0) {
+        remainText = `${diffMin} dakika sonra başlıyor!`;
+      } else {
+        remainText = `ŞU AN DEVAM EDİYOR!`;
+      }
+      document.getElementById('bamCountdown').innerText = remainText;
+
+      modal.classList.add('active');
+    }
+
+    function snoozeCurrentBigAlert() {
+      if (!currentActiveBigAlertMeeting) return;
+      const hours = parseInt(document.getElementById('snoozeHoursSelect').value) || 1;
+      const snoozeUntil = new Date(Date.now() + hours * 3600000).toISOString();
+
+      const m = meetings.find(item => item.id === currentActiveBigAlertMeeting.id);
+      if (m) {
+        m.snoozeUntil = snoozeUntil;
+        saveMeetings();
+      }
+
+      document.getElementById('bigMeetingAlertModal').classList.remove('active');
+      currentActiveBigAlertMeeting = null;
+      alert(`Toplantı uyarısı ${hours} saat sonraya ertelendi.`);
+    }
+
+    function dismissCurrentBigAlert() {
+      if (!currentActiveBigAlertMeeting) return;
+      const m = meetings.find(item => item.id === currentActiveBigAlertMeeting.id);
+      if (m) {
+        m.alertDismissed = true; // Bir daha bu toplantı için ekran uyarısı gelmez
+        saveMeetings();
+      }
+      document.getElementById('bigMeetingAlertModal').classList.remove('active');
+      currentActiveBigAlertMeeting = null;
+      alert('Bu toplantının ekran uyarısı kapatıldı. Toplantı sekmesinde durmaya devam edecektir.');
+    }
+
+    // ==================== DERS PROGRAMI LİSTELEME ====================
+
     function getComputedSlotsForDay(dayNum) {
       const baseSlots = (baseScheduleData[dayNum]?.slots || []).map(s => ({ ...s, originalDay: dayNum }));
       const conflictFilter = document.getElementById('conflictFilter')?.value || 'all';
       let result = [];
 
-      // 1. Orijinal slotları ekle (Taşınmışsa soluk veya gizli işaretle)
+      // 1. Orijinal slotlar
       baseSlots.forEach(slot => {
         const override = movedOverrides[slot.id];
         if (override) {
@@ -794,16 +1396,15 @@
           slot.movedTargetSlot = override.targetSlot;
           slot.movedTargetRoom = override.targetRoom;
           slot.conflictMode = override.conflictMode;
-          result.push(slot); // Orijinal yerinde soluk kalacak
+          result.push(slot);
         } else {
           result.push(slot);
         }
       });
 
-      // 2. Başka günden bu güne TAŞINAN dersleri ekle
+      // 2. Taşınan dersler
       Object.entries(movedOverrides).forEach(([slotId, override]) => {
         if (parseInt(override.targetDay) === dayNum) {
-          // Orijinal slotu bul
           let origSlot = null;
           for (let d = 1; d <= 5; d++) {
             const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
@@ -812,7 +1413,7 @@
           if (origSlot) {
             const [targetS, targetE] = override.targetSlot.split('-');
             const finalRoom = override.targetRoom || origSlot.room;
-            const movedInstance = {
+            result.push({
               ...origSlot,
               start: targetS,
               end: targetE,
@@ -825,20 +1426,47 @@
               origRoom: origSlot.room,
               conflictMode: override.conflictMode,
               overrideKey: slotId
-            };
-            result.push(movedInstance);
+            });
           }
         }
       });
 
-      // Filtreleme mantığı
+      // 3. O güne denk gelen ve 2 gün önceden görünen TOPLANTILARI listeye ekle
+      const now = new Date();
+      meetings.forEach(m => {
+        if (isMeetingExpired(m)) return; // Bitişten sonra kalksın kuralı!
+
+        const [y, mo, d] = m.date.split('-').map(Number);
+        const mDateObj = new Date(y, mo - 1, d);
+        let mDayOfWeek = mDateObj.getDay(); // 0: Pazar, 1: Pazartesi...
+        if (mDayOfWeek === 0) mDayOfWeek = 7;
+
+        // Seçili güne mi denk geliyor?
+        if (mDayOfWeek === dayNum) {
+          // 2 gün önceden görünme kuralı
+          const twoDaysBefore = new Date(y, mo - 1, d - 2, 0, 0, 0);
+          if (now >= twoDaysBefore) {
+            result.push({
+              id: m.id,
+              start: m.startTime,
+              end: m.endTime,
+              code: 'TOPLANTI',
+              title: '🏛️ ' + m.title,
+              room: m.location,
+              roomClass: 'room-meeting',
+              isMeetingItem: true
+            });
+          }
+        }
+      });
+
+      // Filtreleme
       if (conflictFilter === 'onlyMoved') {
         result = result.filter(s => s.isRelocatedTarget || s.isMovedSource);
       } else if (conflictFilter === 'onlyOriginal') {
         result = result.filter(s => !s.isRelocatedTarget);
       }
 
-      // Saate göre sırala
       result.sort((a, b) => a.start.localeCompare(b.start));
       return result;
     }
@@ -851,8 +1479,8 @@
       if (slots.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>🎉 Bugün Dersiniz Yok</h3>
-            <p>${dayNames[activeDay]} günü programınızda tanımlı ders saati bulunmamaktadır.</p>
+            <h3>🎉 Bugün Ders veya Toplantınız Yok</h3>
+            <p>${dayNames[activeDay]} günü programınızda tanımlı faaliyet bulunmamaktadır.</p>
           </div>
         `;
         return;
@@ -874,6 +1502,7 @@
         let cardClasses = ['slot-card'];
         if (isNow) cardClasses.push('current-active');
         if (slot.isMovedSource) cardClasses.push('moved-source');
+        if (slot.isMeetingItem) cardClasses.push('meeting-slot-card');
 
         card.className = cardClasses.join(' ');
 
@@ -884,10 +1513,14 @@
           statusBadgeHtml = `<div class="moved-badge">⚠️ ${dayNames[slot.movedTargetDay]} ${slot.movedTargetSlot}'e taşındı (${slot.movedTargetRoom})</div>`;
         } else if (slot.isRelocatedTarget) {
           statusBadgeHtml = `<div class="relocated-target-badge">🔄 ${dayNames[slot.fromDay]} ${slot.origStart}'den buraya taşındı</div>`;
+        } else if (slot.isMeetingItem) {
+          statusBadgeHtml = `<span style="background:#8b5cf6; color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ TOPLANTI</span>`;
         }
 
         let actionBtnHtml = '';
-        if (slot.isMovedSource || slot.isRelocatedTarget) {
+        if (slot.isMeetingItem) {
+          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--primary);">Toplantılar sekmesinden yönetilir</span>`;
+        } else if (slot.isMovedSource || slot.isRelocatedTarget) {
           const keyToUndo = slot.overrideKey || slot.id;
           actionBtnHtml = `<button class="undo-btn" onclick="undoMove('${keyToUndo}')">↩ Orijinaline Döndür</button>`;
         } else {
@@ -924,20 +1557,18 @@
 
       selectedSlotToMove = slot;
       document.getElementById('modalCourseInfo').innerText = `${slot.title} (${dayNames[slot.day]} ${slot.start} - ${slot.end} • ${slot.room})`;
-      document.getElementById('targetDaySelect').value = slot.day === 5 ? 1 : slot.day + 1; // Bir sonraki gün öner
+      document.getElementById('targetDaySelect').value = slot.day === 5 ? 1 : slot.day + 1;
       
       updateTargetRoomDefault();
       document.getElementById('moveModal').classList.add('active');
     }
 
-    // Hedef saate göre sınıfı otomatik belirle
     function updateTargetRoomDefault() {
       if (!selectedSlotToMove) return;
       const targetDay = parseInt(document.getElementById('targetDaySelect').value);
       const targetSlot = document.getElementById('targetSlotSelect').value;
       const [tsStart] = targetSlot.split('-');
 
-      // Hedef günde o saatte mevcut bir ders var mı?
       const targetDaySlots = baseScheduleData[targetDay]?.slots || [];
       const existingSlot = targetDaySlots.find(s => s.start === tsStart);
 
@@ -945,12 +1576,10 @@
       const hint = document.getElementById('roomAutoHint');
 
       if (existingSlot) {
-        // Hedefte ders var -> Sınıf o dersin sınıfı kalsın
         roomSelect.value = existingSlot.room;
         hint.innerText = `✓ Hedefteki sınıf (${existingSlot.room}) seçildi`;
         hint.style.color = 'var(--primary)';
       } else {
-        // Hedefte ders yok -> Orijinal sınıfı koru
         roomSelect.value = selectedSlotToMove.room;
         hint.innerText = `✓ Orijinal sınıf (${selectedSlotToMove.room}) korundu`;
         hint.style.color = 'var(--text-muted)';
@@ -979,12 +1608,44 @@
 
       saveOverrides();
       closeMoveModal();
-      selectDay(targetDay); // Sonucu görmek için hedef güne geç
+      selectDay(targetDay);
     }
 
     function undoMove(slotId) {
       delete movedOverrides[slotId];
       saveOverrides();
+    }
+
+    function updateChangesBanner() {
+      const banner = document.getElementById('changesBanner');
+      const count = Object.keys(movedOverrides).length;
+      if (count > 0) {
+        banner.style.display = 'flex';
+        document.getElementById('changesText').innerText = `⚡ ${count} dersin saati/sınıfı değiştirildi.`;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function resetAllOverrides() {
+      if (confirm("Tüm taşınan dersler orijinal haftalık programına geri döndürülsün mü?")) {
+        movedOverrides = {};
+        saveOverrides();
+      }
+    }
+
+    function selectDay(dayNum) {
+      activeDay = dayNum;
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById('btnDay' + i);
+        if (btn) btn.classList.toggle('active', i === dayNum);
+      }
+      renderSlots();
+    }
+
+    function goToday() {
+      const day = new Date().getDay();
+      selectDay(day >= 1 && day <= 5 ? day : 1);
     }
 
     function updateClock() {
@@ -995,6 +1656,8 @@
       document.getElementById('currentDateStr').innerText = dateStr;
 
       checkCurrentStatus(now);
+      checkMeetingVisibilityInSchedule();
+      checkBigMeetingAlert();
     }
 
     function checkCurrentStatus(now) {
@@ -1014,7 +1677,7 @@
       const todaySlots = getComputedSlotsForDay(currentDay).filter(s => !s.isMovedSource);
       if (todaySlots.length === 0) {
         liveTagTitle.innerText = "SERBEST GÜN";
-        liveStatusText.innerText = "Bugün programınızda ders bulunmuyor.";
+        liveStatusText.innerText = "Bugün programınızda ders veya toplantı bulunmuyor.";
         liveSubText.innerText = "Akademik ve idari çalışma günü.";
         return;
       }
@@ -1037,16 +1700,16 @@
       }
 
       if (currentSlot) {
-        liveTagTitle.innerText = "CANLI • DERS DEVAM EDİYOR";
+        liveTagTitle.innerText = currentSlot.isMeetingItem ? "CANLI • TOPLANTI DEVAM EDİYOR" : "CANLI • DERS DEVAM EDİYOR";
         liveStatusText.innerText = `${currentSlot.title} (${currentSlot.room})`;
-        liveSubText.innerText = `Dersin bitmesine ${currentSlot.remainMin} dakika kaldı.`;
+        liveSubText.innerText = `Bitişe ${currentSlot.remainMin} dakika kaldı.`;
       } else if (nextSlot) {
-        liveTagTitle.innerText = "SIRADAKİ DERS";
+        liveTagTitle.innerText = nextSlot.isMeetingItem ? "SIRADAKİ TOPLANTI" : "SIRADAKİ DERS";
         liveStatusText.innerText = `${nextSlot.title} — ${nextSlot.room}`;
         liveSubText.innerText = `Saat ${nextSlot.start}'te başlıyor (${nextSlot.startInMin} dk kaldı).`;
       } else {
         liveTagTitle.innerText = "GÜN BİTTİ";
-        liveStatusText.innerText = "Bugünkü tüm dersleriniz tamamlandı.";
+        liveStatusText.innerText = "Bugünkü tüm faaliyetleriniz tamamlandı.";
         liveSubText.innerText = "İyi dinlenmeler Hocam!";
       }
     }
@@ -1063,7 +1726,7 @@
       const dayOffsetMap = { 1: "MO", 2: "TU", 3: "WE", 4: "TH", 5: "FR" };
       
       for (let dayNum = 1; dayNum <= 5; dayNum++) {
-        const slots = getComputedSlotsForDay(dayNum).filter(s => !s.isMovedSource);
+        const slots = getComputedSlotsForDay(dayNum).filter(s => !s.isMovedSource && !s.isMeetingItem);
         if (slots.length === 0) continue;
         const rruleDay = dayOffsetMap[dayNum];
 
@@ -1088,16 +1751,56 @@
           );
         });
       }
+
+      // Toplantıları da takvime ekle
+      meetings.forEach((m, idx) => {
+        const cleanDate = m.date.replace(/-/g, '');
+        const sHour = m.startTime.replace(':', '') + "00";
+        const eHour = m.endTime.replace(':', '') + "00";
+        icsContent.push(
+          "BEGIN:VEVENT",
+          `UID:kmyo-meet-${idx}@mku.edu.tr`,
+          `SUMMARY:🏛️ ${m.title} (${m.location})`,
+          `LOCATION:${m.location}`,
+          `DESCRIPTION:Toplantı\\nÖğr. Gör. Fatih Akman ÇAKMAK`,
+          `DTSTART:${cleanDate}T${sHour}`,
+          `DTEND:${cleanDate}T${eHour}`,
+          "BEGIN:VALARM",
+          "TRIGGER:-PT15M",
+          "ACTION:DISPLAY",
+          "DESCRIPTION:15 dakika sonra toplantınız var!",
+          "END:VALARM",
+          "END:VEVENT"
+        );
+      });
+
       icsContent.push("END:VCALENDAR");
 
       const blob = new Blob([icsContent.join("\r\n")], { type: "text/calendar;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Fatih_Akman_Cakmak_Guncel_Ders_Programi.ics";
+      a.download = "Fatih_Akman_Cakmak_Guncel_Ders_ve_Toplanti_Programi.ics";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    function init() {
+      const now = new Date();
+      let dayIndex = now.getDay();
+      if (dayIndex < 1 || dayIndex > 5) dayIndex = 1;
+      activeDay = dayIndex;
+      selectDay(activeDay);
+      updateClock();
+      setInterval(updateClock, 1000);
+      updateChangesBanner();
+      updateMeetingsBadge();
+      
+      // Bugünün tarihini toplantı inputuna otomatik ver
+      const todayIso = now.toISOString().split('T')[0];
+      const inpDate = document.getElementById('inpMeetingDate');
+      if (inpDate) inpDate.value = todayIso;
     }
 
     window.onload = init;
