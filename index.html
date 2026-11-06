@@ -1116,16 +1116,19 @@
     </div>
   </div>
 
-  <!-- Ana Mod Sekmeleri: [Ders Programı] | [Sınavlar (N)] | [Toplantılar (N)] -->
+  <!-- Ana Mod Sekmeleri: [Ders Programı] | [Sınavlar (N)] | [Sınav Ekranı] | [Toplantılar (N)] -->
   <div class="main-nav-tabs">
     <button class="main-tab-btn active" id="tabNavSchedule" onclick="switchMainView('schedule')">
-      📚 Haftalık Program
+      📚 Program
     </button>
     <button class="main-tab-btn" id="tabNavExams" onclick="switchMainView('exams')">
       📝 Sınavlar <span class="tab-counter exam-counter" id="examBadgeCnt">7</span>
     </button>
+    <button class="main-tab-btn" id="tabNavProjector" onclick="switchMainView('projector')">
+      🖥️ Sınav Ekranı
+    </button>
     <button class="main-tab-btn" id="tabNavMeetings" onclick="switchMainView('meetings')">
-      🏛️ Toplantılar <span class="tab-counter meeting-counter" id="meetingBadgeCnt">0</span>
+      🏛️ Toplantı <span class="tab-counter meeting-counter" id="meetingBadgeCnt">0</span>
     </button>
   </div>
 
@@ -1339,6 +1342,171 @@
       📌 Kayıtlı Toplantılarım
     </div>
     <div id="meetingsListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
+  <!-- ==================== GÖRÜNÜM 4: CANLI SINAV EKRANI VE HOCA KÜRSÜSÜ ==================== -->
+  <div class="section-view" id="viewProjector">
+    <!-- Üst Bilgi Başlığı -->
+    <div style="background:linear-gradient(135deg, #090d16, #1e293b); border:1.5px solid rgba(56,189,248,0.35); border-radius:16px; padding:16px; color:#fff; margin-bottom:16px; box-shadow:0 4px 20px rgba(0,0,0,0.25);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:28px;">🖥️</span>
+          <div>
+            <div style="font-size:16px; font-weight:900; color:#38bdf8;">Canlı Sınav Ekranı & Hoca Kürsüsü</div>
+            <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Sınav sayacını başlatın, süreyi ve çıkış yasağını telefondan yönetin</div>
+          </div>
+        </div>
+        <button onclick="window.open('sinav-ekrani.html', '_blank')" style="background:#0284c7; color:#fff; border:none; padding:8px 14px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap;">
+          ⛶ Tam Ekran
+        </button>
+      </div>
+    </div>
+
+    <!-- Sınav Ayar ve Başlatma Formu -->
+    <div class="custom-form-card" id="projTabSetupCard">
+      <div class="cfc-title" style="color:var(--primary);">⚙️ Sınav Süresi ve Çıkış Yasağı Ayarları</div>
+
+      <div class="form-group">
+        <label class="form-label">Sınav / Ders Seçiniz *</label>
+        <select class="form-select" id="projTabSelectExam" onchange="onProjTabExamSelected()">
+          <option value="custom">✏️ Manuel Sınav Tanımla</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1.8;">
+          <label class="form-label">Ders Adı *</label>
+          <input type="text" class="form-input" id="projTabCourseName" value="Web Güvenliği">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">Sınav Türü</label>
+          <select class="form-select" id="projTabExamType">
+            <option value="Vize">🔴 Vize</option>
+            <option value="Final">🟣 Final</option>
+            <option value="Bütünleme">🟠 Bütünleme</option>
+            <option value="Mazeret">🔵 Mazeret</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Salon / Amfi</label>
+          <input type="text" class="form-input" id="projTabRoomName" value="Amfi-4">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ders Kodu</label>
+          <input type="text" class="form-input" id="projTabCourseCode" value="74322301">
+        </div>
+      </div>
+
+      <!-- Sınav Süresi Girişi -->
+      <div class="form-group" style="background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.2); padding:12px; border-radius:12px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label class="form-label" style="color:var(--primary); font-weight:800; margin:0;">
+            ⏱️ Sınav Süresi (Dakika) *
+          </label>
+          <span style="font-size:11px; color:var(--text-muted);">İstediğiniz süreyi girin</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="number" class="form-input" id="projTabDuration" value="45" min="5" max="180" style="font-size:16px; font-weight:800; width:100px; margin-bottom:0;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(30)">30 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(40)">40 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(45)">45 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(50)">50 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(60)">60 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(75)">75 dk</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Erken ve Son Çıkış Yasağı Girişi -->
+      <div class="form-group" style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); padding:12px; border-radius:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label class="form-label" style="color:#ef4444; font-weight:800; margin:0;">
+            🚫 Erken Çıkış Yasağı (İlk Kaç Dakika?) *
+          </label>
+          <span style="font-size:11px; color:var(--text-muted);">Çıkışın yasak olduğu ilk süre</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <input type="number" class="form-input" id="projTabEarlyExit" value="30" min="0" max="120" style="font-size:15px; font-weight:800; width:100px; margin-bottom:0;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(15)">15 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(20)">20 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(30)">30 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(0)">Yasak Yok (0)</button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label class="form-label" style="color:#f59e0b; font-weight:800; margin:0;">
+            ⚠️ Son Çıkış Yasağı (Son Kaç Dakika?)
+          </label>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="number" class="form-input" id="projTabLateExit" value="5" min="0" max="30" style="font-size:15px; font-weight:800; width:100px; margin-bottom:0;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
+            <button type="button" class="btn-time-pill" onclick="setProjTabLateExit(5)">5 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabLateExit(10)">10 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabLateExit(0)">Yasak Yok (0)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aksiyon Düğmeleri -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn-submit-action" style="background:linear-gradient(135deg, #0284c7, #0369a1); font-size:15px;" onclick="startInTabProjector()">
+          ▶ Sınav Sayacını ve Ekranını Başlat
+        </button>
+        <button class="btn-submit-action" style="background:#1e293b; color:#38bdf8; border:1.5px solid #38bdf8;" onclick="launchStandaloneProjector()">
+          🚀 HDMI Projeksiyon Sayfasına Git (Ayrı Sayfa)
+        </button>
+      </div>
+    </div>
+
+    <!-- Canlı Çalışan Sayaç Paneli (Telefonda görünür) -->
+    <div id="projTabLiveContainer" style="display:none; background:#070b14; border:2px solid #38bdf8; border-radius:20px; padding:20px 16px; color:#fff; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.5); margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:12px;">
+        <div style="text-align:left;">
+          <span class="badge-exam-type" id="tabLiveExamType" style="background:#ef4444; font-size:11px; padding:3px 8px; border-radius:6px; font-weight:800;">VİZE</span>
+          <span id="tabLiveCourseTitle" style="font-weight:900; font-size:15px; margin-left:6px;">Web Güvenliği</span>
+        </div>
+        <div id="tabLiveRoom" style="font-size:12px; color:#38bdf8; font-weight:800;">📍 Amfi-4</div>
+      </div>
+
+      <div style="font-size:12px; font-weight:800; letter-spacing:2px; color:#94a3b8; text-transform:uppercase;" id="tabLiveTimerLabel">KALAN SÜRE</div>
+      <div style="font-size:clamp(3.5rem, 15vw, 6rem); font-weight:900; font-variant-numeric:tabular-nums; color:#fff; line-height:1.1; margin:8px 0;" id="tabLiveCountdown">45:00</div>
+
+      <!-- Çıkış Durumu Rozeti -->
+      <div class="exit-status-card status-forbidden" id="tabLiveExitStatus" style="font-size:14px; padding:8px 16px; border-radius:12px; margin-bottom:14px; width:100%; justify-content:center;">
+        <span>🚫</span>
+        <span id="tabLiveExitStatusText">SALONDAN ÇIKIŞ YASAKTIR (30 dk)</span>
+      </div>
+
+      <!-- İlerleme Çubuğu -->
+      <div style="width:100%; height:10px; background:rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; margin-bottom:16px;">
+        <div id="tabLiveProgress" style="width:100%; height:100%; background:linear-gradient(90deg, #0284c7, #38bdf8); transition:width 1s linear;"></div>
+      </div>
+
+      <!-- Hoca Kumanda Butonları (Telefonda dokunulacak butonlar) -->
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px;">
+        <button class="btn-dock btn-primary" id="tabLiveBtnPause" onclick="tabLiveTogglePause()">
+          <span id="tabLivePauseIcon">⏸</span> <span id="tabLivePauseText">Duraklat</span>
+        </button>
+        <button class="btn-dock" onclick="tabLiveAddMinutes(5)">⏱ +5 Dk</button>
+        <button class="btn-dock" onclick="tabLiveAddMinutes(10)">⏱ +10 Dk</button>
+        <button class="btn-dock" onclick="tabLivePromptAnnouncement()">📢 Duyuru</button>
+        <button class="btn-dock" onclick="window.open('sinav-ekrani.html', '_blank')">⛶ Tam Ekran</button>
+        <button class="btn-dock btn-danger" onclick="tabLiveFinishExam()">⏹ Bitir</button>
+      </div>
+
+      <div style="display:flex; justify-content:center; margin-top:8px;">
+        <button onclick="stopInTabProjector()" style="background:none; border:none; color:#94a3b8; font-size:12px; text-decoration:underline; cursor:pointer;">
+          ⚙️ Ayarlara Dön / Yeni Sınav Seç
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ==================== CANLI PROJEKSİYON SINAV AYARLARI MODALI ==================== -->
@@ -1891,22 +2059,31 @@
       const scheduleView = document.getElementById('viewSchedule');
       const examsView = document.getElementById('viewExams');
       const meetingsView = document.getElementById('viewMeetings');
+      const projectorView = document.getElementById('viewProjector');
       
       const tabSched = document.getElementById('tabNavSchedule');
       const tabExam = document.getElementById('tabNavExams');
+      const tabProjector = document.getElementById('tabNavProjector');
       const tabMeet = document.getElementById('tabNavMeetings');
 
       scheduleView.style.display = 'none';
       examsView.classList.remove('active');
       meetingsView.classList.remove('active');
+      if (projectorView) projectorView.classList.remove('active');
+
       tabSched.classList.remove('active');
       tabExam.classList.remove('active');
+      if (tabProjector) tabProjector.classList.remove('active');
       tabMeet.classList.remove('active');
 
       if (viewName === 'exams') {
         examsView.classList.add('active');
         tabExam.classList.add('active');
         renderExamsList();
+      } else if (viewName === 'projector') {
+        if (projectorView) projectorView.classList.add('active');
+        if (tabProjector) tabProjector.classList.add('active');
+        initProjectorTabView();
       } else if (viewName === 'meetings') {
         meetingsView.classList.add('active');
         tabMeet.classList.add('active');
@@ -3374,6 +3551,223 @@
 
     function hideRemoteControlDock() {
       document.getElementById('remoteControlDock').classList.remove('active');
+    }
+
+    // ==================== SEKME İÇİ CANLI SINAV SAYACI (TELEFON İÇİN) ====================
+    let tabLiveInterval = null;
+    let tabLiveRemaining = 0;
+    let tabLiveTotal = 0;
+    let tabLiveEarlyExit = 30;
+    let tabLiveLateExit = 5;
+    let tabLiveIsPaused = false;
+
+    function initProjectorTabView() {
+      const selectEl = document.getElementById('projTabSelectExam');
+      if (!selectEl) return;
+      selectEl.innerHTML = '<option value="custom">✏️ Manuel Sınav Tanımla</option>';
+
+      exams.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex.id;
+        opt.innerText = `[${ex.type || 'Vize'}] ${ex.title} (${ex.date} ${ex.startTime} - ${ex.location})`;
+        selectEl.appendChild(opt);
+      });
+
+      if (exams.length > 0) {
+        selectEl.value = exams[0].id;
+        fillProjTabForm(exams[0].id);
+      } else {
+        selectEl.value = 'custom';
+        fillProjTabForm(null);
+      }
+    }
+
+    function onProjTabExamSelected() {
+      const id = document.getElementById('projTabSelectExam').value;
+      if (id === 'custom') fillProjTabForm(null);
+      else fillProjTabForm(id);
+    }
+
+    function fillProjTabForm(examId) {
+      const ex = exams.find(e => e.id === examId);
+      if (ex) {
+        document.getElementById('projTabCourseName').value = ex.title || 'Web Güvenliği';
+        document.getElementById('projTabExamType').value = ex.type || 'Vize';
+        document.getElementById('projTabRoomName').value = ex.location || 'Amfi-4';
+        document.getElementById('projTabCourseCode').value = ex.code || '74322301';
+
+        if (ex.startTime && ex.endTime) {
+          const [sh, sm] = ex.startTime.split(':').map(Number);
+          const [eh, em] = ex.endTime.split(':').map(Number);
+          const diffMinutes = (eh * 60 + em) - (sh * 60 + sm);
+          if (diffMinutes > 0) {
+            document.getElementById('projTabDuration').value = diffMinutes;
+            const early = Math.min(30, Math.floor(diffMinutes / 2));
+            document.getElementById('projTabEarlyExit').value = early > 0 ? early : 15;
+          }
+        }
+      }
+    }
+
+    function setProjTabDuration(mins) {
+      document.getElementById('projTabDuration').value = mins;
+    }
+
+    function setProjTabEarlyExit(mins) {
+      document.getElementById('projTabEarlyExit').value = mins;
+    }
+
+    function setProjTabLateExit(mins) {
+      document.getElementById('projTabLateExit').value = mins;
+    }
+
+    function startInTabProjector() {
+      const courseName = document.getElementById('projTabCourseName').value.trim() || 'Ders';
+      const examType = document.getElementById('projTabExamType').value;
+      const roomName = document.getElementById('projTabRoomName').value.trim() || 'Amfi';
+      const courseCode = document.getElementById('projTabCourseCode').value.trim() || '';
+      const totalDur = parseInt(document.getElementById('projTabDuration').value) || 45;
+      const earlyExit = parseInt(document.getElementById('projTabEarlyExit').value) || 0;
+      const lateExit = parseInt(document.getElementById('projTabLateExit').value) || 0;
+
+      tabLiveTotal = totalDur * 60;
+      tabLiveRemaining = tabLiveTotal;
+      tabLiveEarlyExit = earlyExit;
+      tabLiveLateExit = lateExit;
+      tabLiveIsPaused = false;
+
+      // Konfigürasyonu kaydet ve yayınla
+      const config = {
+        courseName,
+        examType,
+        roomName,
+        courseCode,
+        totalDurationMinutes: totalDur,
+        earlyExitMinutes: earlyExit,
+        lateExitMinutes: lateExit,
+        startTimestamp: Date.now()
+      };
+      localStorage.setItem('kmyo_active_projector_exam', JSON.stringify(config));
+      sendRemoteCommand('STATE_UPDATE', { examConfig: config, totalSeconds: tabLiveTotal, remainingSeconds: tabLiveRemaining });
+
+      // UI'yi canlı moda al
+      document.getElementById('projTabSetupCard').style.display = 'none';
+      const liveBox = document.getElementById('projTabLiveContainer');
+      liveBox.style.display = 'block';
+
+      document.getElementById('tabLiveCourseTitle').innerText = courseName;
+      document.getElementById('tabLiveExamType').innerText = examType.toUpperCase();
+      document.getElementById('tabLiveRoom').innerText = '📍 ' + roomName;
+
+      renderTabLiveTimer();
+      clearInterval(tabLiveInterval);
+      tabLiveInterval = setInterval(() => {
+        if (!tabLiveIsPaused && tabLiveRemaining > 0) {
+          tabLiveRemaining--;
+          renderTabLiveTimer();
+          if (tabLiveRemaining === 0) {
+            tabLiveFinishExam();
+          }
+        }
+      }, 1000);
+    }
+
+    function renderTabLiveTimer() {
+      const m = Math.floor(tabLiveRemaining / 60);
+      const s = tabLiveRemaining % 60;
+      const str = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      document.getElementById('tabLiveCountdown').innerText = str;
+
+      const progress = (tabLiveRemaining / tabLiveTotal) * 100;
+      document.getElementById('tabLiveProgress').style.width = Math.max(0, Math.min(100, progress)) + '%';
+
+      // Çıkış durumu
+      const elapsedMin = Math.floor((tabLiveTotal - tabLiveRemaining) / 60);
+      const elCard = document.getElementById('tabLiveExitStatus');
+      const elText = document.getElementById('tabLiveExitStatusText');
+
+      if (tabLiveEarlyExit > 0 && elapsedMin < tabLiveEarlyExit) {
+        elCard.className = 'exit-status-card status-forbidden';
+        elText.innerText = `SALONDAN ÇIKIŞ YASAKTIR (${tabLiveEarlyExit - elapsedMin} dk kaldı)`;
+      } else if (tabLiveLateExit > 0 && tabLiveRemaining <= (tabLiveLateExit * 60) && tabLiveRemaining > 0) {
+        elCard.className = 'exit-status-card status-late-forbidden';
+        elText.innerText = `SON ${tabLiveLateExit} DAKİKA: ÇIKIŞLAR KAPATILMIŞTIR`;
+      } else {
+        elCard.className = 'exit-status-card status-allowed';
+        const freeLeft = Math.max(0, Math.floor(tabLiveRemaining / 60) - tabLiveLateExit);
+        elText.innerText = `ÇIKIŞ SERBESTTİR ${freeLeft > 0 ? '(' + freeLeft + ' dk)' : ''}`;
+      }
+    }
+
+    function tabLiveTogglePause() {
+      tabLiveIsPaused = !tabLiveIsPaused;
+      const btnIcon = document.getElementById('tabLivePauseIcon');
+      const btnText = document.getElementById('tabLivePauseText');
+      if (tabLiveIsPaused) {
+        btnIcon.innerText = '▶';
+        btnText.innerText = 'Devam';
+        document.getElementById('tabLiveTimerLabel').innerText = '⏸ DURAKLATILDI';
+        sendRemoteCommand('PAUSE');
+      } else {
+        btnIcon.innerText = '⏸';
+        btnText.innerText = 'Duraklat';
+        document.getElementById('tabLiveTimerLabel').innerText = 'KALAN SÜRE';
+        sendRemoteCommand('RESUME');
+      }
+    }
+
+    function tabLiveAddMinutes(min) {
+      tabLiveRemaining += (min * 60);
+      tabLiveTotal += (min * 60);
+      renderTabLiveTimer();
+      sendRemoteCommand('ADD_TIME', { minutes: min });
+    }
+
+    function tabLivePromptAnnouncement() {
+      const txt = prompt('Tahtaya gönderilecek duyuruyu yazınız:');
+      if (txt && txt.trim()) {
+        sendRemoteCommand('ANNOUNCE', { text: txt.trim() });
+      }
+    }
+
+    function tabLiveFinishExam() {
+      clearInterval(tabLiveInterval);
+      tabLiveRemaining = 0;
+      document.getElementById('tabLiveCountdown').innerText = "00:00";
+      document.getElementById('tabLiveTimerLabel').innerText = "SINAV BİTTİ";
+      const elCard = document.getElementById('tabLiveExitStatus');
+      elCard.className = 'exit-status-card status-finished';
+      document.getElementById('tabLiveExitStatusText').innerText = "SINAV SONA ERMİŞTİR!";
+      sendRemoteCommand('FINISH');
+    }
+
+    function stopInTabProjector() {
+      clearInterval(tabLiveInterval);
+      document.getElementById('projTabLiveContainer').style.display = 'none';
+      document.getElementById('projTabSetupCard').style.display = 'block';
+    }
+
+    function launchStandaloneProjector() {
+      const courseName = document.getElementById('projTabCourseName').value.trim() || 'Web Güvenliği';
+      const examType = document.getElementById('projTabExamType').value;
+      const roomName = document.getElementById('projTabRoomName').value.trim() || 'Amfi-4';
+      const courseCode = document.getElementById('projTabCourseCode').value.trim() || '';
+      const totalDur = parseInt(document.getElementById('projTabDuration').value) || 45;
+      const earlyExit = parseInt(document.getElementById('projTabEarlyExit').value) || 0;
+      const lateExit = parseInt(document.getElementById('projTabLateExit').value) || 0;
+
+      const config = {
+        courseName,
+        examType,
+        roomName,
+        courseCode,
+        totalDurationMinutes: totalDur,
+        earlyExitMinutes: earlyExit,
+        lateExitMinutes: lateExit,
+        startTimestamp: Date.now()
+      };
+      localStorage.setItem('kmyo_active_projector_exam', JSON.stringify(config));
+      window.location.href = 'sinav-ekrani.html';
     }
 
     function init() {
