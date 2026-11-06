@@ -1,7 +1,8 @@
-const CACHE_NAME = 'kmyo-schedule-v6';
+const CACHE_NAME = 'kmyo-schedule-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './sinav-ekrani.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

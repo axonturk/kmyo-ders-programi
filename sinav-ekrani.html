@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KMYO Canlı Sınav Projeksiyon Ekranı</title>
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.35);
+      --vize: #ef4444;
+      --final: #a855f7;
+      --but: #f59e0b;
+      --mazeret: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+    }
+
+    /* ÜST BAŞLIK BÖLÜMÜ */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .school-logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e3a8a, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+    }
+
+    .school-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .school-sub {
+      font-size: 18px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+
+    .exam-tag-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 6px 16px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-exam-type {
+      font-size: 13px;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #fff;
+      background: var(--vize);
+    }
+
+    .exam-course-name {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .exam-room-pill {
+      font-size: 13px;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .header-right {
+      text-align: right;
+    }
+
+    .current-clock {
+      font-size: 30px;
+      font-weight: 900;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .current-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* ORTA BÖLÜM: DEV SAYAÇ & DURUM BİLGİSİ */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+    }
+
+    .countdown-display {
+      font-size: clamp(5rem, 16vw, 13rem);
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+      color: #ffffff;
+      text-shadow: 0 0 35px rgba(255, 255, 255, 0.25);
+      transition: color 0.4s ease, text-shadow 0.4s ease;
+      margin-bottom: 0.8rem;
+    }
+
+    .countdown-display.warning-time {
+      color: #f59e0b;
+      text-shadow: 0 0 45px rgba(245, 158, 11, 0.4);
+    }
+
+    .countdown-display.danger-time {
+      color: #ef4444;
+      text-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
+      animation: pulseAlert 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.82; transform: scale(1.02); }
+    }
+
+    /* İLERLEME ÇUBUĞU */
+    .progress-container {
+      width: 100%;
+      max-width: 820px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      border-radius: 10px;
+      transition: width 1s linear;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+    }
+
+    /* ÇIKIŞ YASAĞI DURUM KUTUSU */
+    .exit-status-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 28px;
+      border-radius: 16px;
+      font-size: clamp(15px, 2.2vw, 22px);
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .status-forbidden {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35));
+      border: 2px solid #ef4444;
+      color: #fca5a5;
+      text-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .status-allowed {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
+      border: 2px solid #10b981;
+      color: #6ee7b7;
+      text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .status-late-forbidden {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+      border: 2px solid #f59e0b;
+      color: #fde68a;
+      text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .status-finished {
+      background: linear-gradient(135deg, #b91c1c, #dc2626);
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-size: clamp(18px, 3vw, 28px);
+      padding: 16px 36px;
+      animation: pulseAlert 0.8s infinite;
+    }
+
+    /* HOCA CANLI DUYURU BANDI */
+    .announcement-banner {
+      width: 100%;
+      max-width: 900px;
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.35));
+      border: 2px solid #f59e0b;
+      border-radius: 14px;
+      padding: 12px 20px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      color: #fef08a;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      animation: slideDown 0.4s ease;
+    }
+
+    .announcement-banner.active {
+      display: flex;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ALT KURALLAR BÖLÜMÜ */
+    footer {
+      width: 100%;
+      border-top: 1px solid var(--card-border);
+      padding-top: 1.2rem;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .rule-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 10px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rule-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .rule-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
+
+    /* YÜZEN HOCA KUMANDA ÇUBUĞU (KÜRSÜ BAR) */
+    .control-dock {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    .control-dock:hover, .control-dock.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .btn-dock {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-dock:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-dock.btn-primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .btn-dock.btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .btn-dock.btn-danger {
+      background: #dc2626;
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    .btn-dock.btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    /* MODAL (AYARLAR VE DUYURU GİRİŞİ) */
+    .overlay-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 1rem;
+    }
+
+    .overlay-modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      color: #fff;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #38bdf8;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-save-modal {
+      width: 100%;
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      header { flex-direction: column; text-align: center; }
+      .header-right { text-align: center; }
+      .rules-grid { grid-template-columns: 1fr; }
+      .control-dock { bottom: 10px; padding: 6px 10px; gap: 6px; }
+      .btn-dock span.text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== ÜST BAŞLIK BÖLÜMÜ ==================== -->
+  <header>
+    <div class="header-left">
+      <div class="school-logo">🎓</div>
+      <div>
+        <div class="school-title">Hatay Mustafa Kemal Üniversitesi</div>
+        <div class="school-sub">Kırıkhan Meslek Yüksekokulu</div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="exam-tag-group">
+        <span class="badge-exam-type" id="txtExamType">VİZE</span>
+        <span class="exam-course-name" id="txtCourseName">Web Güvenliği</span>
+        <span class="exam-room-pill" id="txtRoomName">📍 Amfi-4</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="current-clock" id="liveClock">00:00:00</div>
+      <div class="current-date" id="liveDate">09 Kasım 2026, Pazartesi</div>
+    </div>
+  </header>
+
+  <!-- ==================== ORTA BÖLÜM: GERİ SAYIM SAYACI ==================== -->
+  <main>
+    <div class="timer-label" id="timerLabel">KALAN SINAV SÜRESİ</div>
+    
+    <div class="countdown-display" id="cntCountdown">45:00</div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="cntProgressBar" style="width: 100%;"></div>
+    </div>
+
+    <!-- DİNAMİK ÇIKIŞ YASAĞI DURUM ROZETİ -->
+    <div class="exit-status-card status-forbidden" id="cntExitStatus">
+      <span>🚫</span>
+      <span id="txtExitStatusText">SALONDAN ÇIKIŞ YASAKTIR (Yasağın Bitmesine: 30 dk)</span>
+    </div>
+
+    <!-- HOCA CANLI DUYURU BANDI -->
+    <div class="announcement-banner" id="announcementBanner">
+      <span style="font-size:22px;">📢</span>
+      <span id="txtAnnouncementText">Duyuru: Sınav süresine +5 dakika eklenmiştir.</span>
+      <button onclick="clearAnnouncement()" style="margin-left:auto; background:none; border:none; color:#fef08a; font-weight:800; font-size:16px; cursor:pointer;">&times;</button>
+    </div>
+  </main>
+
+  <!-- ==================== ALT AMFİ KURALLARI ==================== -->
+  <footer>
+    <div class="rules-grid" id="rulesGrid">
+      <div class="rule-card">
+        <div class="rule-icon">✍️</div>
+        <div class="rule-text" id="ruleText1">Optik cevap formunuza Öğrenci Numaranızı ve Kitapçık Türünü eksiksiz kodlayınız.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🔕</div>
+        <div class="rule-text" id="ruleText2">Cep telefonlarının sınav boyunca tamamen kapalı ve çantalarda olması zorunludur.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">⏳</div>
+        <div class="rule-text" id="ruleText3">Belirlenen erken çıkış yasağı süresi dolmadan sınav salonu kesinlikle terk edilemez.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== YÜZEN HOCA KÜRSÜ KUMANDA ÇUBUĞU ==================== -->
+  <div class="control-dock" id="controlDock">
+    <button class="btn-dock btn-primary" id="btnToggleTimer" onclick="toggleTimer()">
+      <span id="btnToggleIcon">⏸</span>
+      <span class="text" id="btnToggleText">Duraklat</span>
+    </button>
+    <button class="btn-dock" onclick="addMinutes(5)">
+      <span>⏱</span>
+      <span class="text">+5 Dk</span>
+    </button>
+    <button class="btn-dock" onclick="addMinutes(10)">
+      <span>⏱</span>
+      <span class="text">+10 Dk</span>
+    </button>
+    <button class="btn-dock" onclick="openAnnouncementModal()">
+      <span>📢</span>
+      <span class="text">Duyuru</span>
+    </button>
+    <button class="btn-dock" onclick="openSettingsModal()">
+      <span>⚙️</span>
+      <span class="text">Ayarlar</span>
+    </button>
+    <button class="btn-dock" onclick="toggleMute()">
+      <span id="muteIcon">🔔</span>
+    </button>
+    <button class="btn-dock" onclick="toggleFullScreen()">
+      <span>⛶</span>
+      <span class="text">Tam Ekran</span>
+    </button>
+    <button class="btn-dock btn-danger" onclick="finishExamEarly()">
+      <span>⏹</span>
+      <span class="text">Bitir</span>
+    </button>
+  </div>
+
+  <!-- ==================== DUYURU GİRİŞ MODALI ==================== -->
+  <div class="overlay-modal" id="announcementModal">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>📢 Tahtaya Canlı Duyuru Yansıt</span>
+        <button onclick="closeAnnouncementModal()" style="background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer;">&times;</button>
+      </div>
+      <label class="form-label">Duyuru Metni (Tahtada sarı şerit halinde gösterilir):</label>
+      <input type="text" class="form-input" id="inpAnnouncement" placeholder="Örn: 4. soruda A şıkkı 192.168.1.1 olarak düzeltilmiştir.">
+      <button class="btn-save-modal" onclick="sendAnnouncement()">🚀 Tahtaya Yansıt</button>
+    </div>
+  </div>
+
+  <!-- ==================== SÜRE VE ÇIKIŞ YASAĞI AYARLARI MODALI ==================== -->
+  <div class="overlay-modal" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>⚙️ Sınav ve Çıkış Yasağı Ayarları</span>
+        <button onclick="closeSettingsModal()" style="background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer;">&times;</button>
+      </div>
+      
+      <div style="display:flex; gap:12px;">
+        <div style="flex:1;">
+          <label class="form-label">Sınav Süresi (Dakika)</label>
+          <input type="number" class="form-input" id="cfgDuration" min="5" max="180">
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">İlk Kaç Dk Çıkış Yasak?</label>
+          <input type="number" class="form-input" id="cfgEarlyExit" min="0" max="120">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div style="flex:1;">
+          <label class="form-label">Son Kaç Dk Çıkış Yasak?</label>
+          <input type="number" class="form-input" id="cfgLateExit" min="0" max="60">
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Salon / Amfi</label>
+          <input type="text" class="form-input" id="cfgRoom">
+        </div>
+      </div>
+
+      <label class="form-label">Ders Adı</label>
+      <input type="text" class="form-input" id="cfgCourse">
+
+      <button class="btn-save-modal" onclick="applySettings()">💾 Değişiklikleri Uygula</button>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ÇEKİRDEĞİ ==================== -->
+  <script>
+    // URL parametreleri veya localStorage'dan oturumu al
+    const params = new URLSearchParams(window.location.search);
+    const storedConfig = JSON.parse(localStorage.getItem('kmyo_active_projector_exam') || '{}');
+
+    // Başlangıç Değerleri
+    let examConfig = {
+      courseName: params.get('course') || storedConfig.courseName || 'Web Güvenliği',
+      examType: params.get('type') || storedConfig.examType || 'Vize',
+      roomName: params.get('room') || storedConfig.roomName || 'Amfi-4',
+      totalDurationMinutes: parseInt(params.get('duration') || storedConfig.totalDurationMinutes || 45),
+      earlyExitMinutes: parseInt(params.get('earlyExit') || (storedConfig.earlyExitMinutes !== undefined ? storedConfig.earlyExitMinutes : 30)),
+      lateExitMinutes: parseInt(params.get('lateExit') || (storedConfig.lateExitMinutes !== undefined ? storedConfig.lateExitMinutes : 5)),
+      rule1: storedConfig.rule1 || "Optik cevap formunuza Öğrenci Numaranızı ve Kitapçık Türünü eksiksiz kodlayınız.",
+      rule2: storedConfig.rule2 || "Cep telefonlarının sınav boyunca tamamen kapalı ve çantalarda olması zorunludur.",
+      rule3: storedConfig.rule3 || "Belirlenen erken çıkış yasağı süresi dolmadan sınav salonu kesinlikle terk edilemez.",
+      announcement: storedConfig.announcement || ""
+    };
+
+    let totalSeconds = examConfig.totalDurationMinutes * 60;
+    let remainingSeconds = totalSeconds;
+    let isPaused = false;
+    let isFinished = false;
+    let soundMuted = false;
+    let timerInterval = null;
+
+    // Yayın Kanalı (Aynı cihazda diğer sekme veya telefon kumandası ile anlık eşitleme)
+    let syncChannel = null;
+    try {
+      syncChannel = new BroadcastChannel('kmyo_exam_channel');
+      syncChannel.onmessage = (event) => {
+        handleRemoteCommand(event.data);
+      };
+    } catch(e) {
+      console.log('BroadcastChannel desteklenmiyor:', e);
+    }
+
+    // LocalStorage değişikliklerini dinle (Cross-tab sync yedeği)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'kmyo_remote_command' && e.newValue) {
+        try {
+          const cmd = JSON.parse(e.newValue);
+          handleRemoteCommand(cmd);
+        } catch(err){}
+      }
+    });
+
+    function init() {
+      applyConfigToUI();
+      startClocks();
+      playChime('start');
+      resetActivityTimer();
+    }
+
+    function applyConfigToUI() {
+      document.getElementById('txtCourseName').innerText = examConfig.courseName;
+      document.getElementById('txtExamType').innerText = (examConfig.examType || 'Vize').toUpperCase();
+      document.getElementById('txtRoomName').innerText = '📍 ' + examConfig.roomName;
+
+      // Renk teması
+      const badge = document.getElementById('txtExamType');
+      if (examConfig.examType === 'Final') badge.style.background = 'var(--final)';
+      else if (examConfig.examType === 'Bütünleme') badge.style.background = 'var(--but)';
+      else if (examConfig.examType === 'Mazeret') badge.style.background = 'var(--mazeret)';
+      else badge.style.background = 'var(--vize)';
+
+      // Kurallar
+      if (examConfig.rule1) document.getElementById('ruleText1').innerText = examConfig.rule1;
+      if (examConfig.rule2) document.getElementById('ruleText2').innerText = examConfig.rule2;
+      if (examConfig.rule3) document.getElementById('ruleText3').innerText = examConfig.rule3;
+
+      if (examConfig.announcement) {
+        setAnnouncementText(examConfig.announcement);
+      }
+    }
+
+    function startClocks() {
+      updateRealClock();
+      setInterval(updateRealClock, 1000);
+
+      renderTimer();
+      timerInterval = setInterval(() => {
+        if (!isPaused && !isFinished) {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            renderTimer();
+            if (remainingSeconds === 300) { // Son 5 dk
+              playChime('warning');
+            }
+          } else {
+            finishExam();
+          }
+        }
+      }, 1000);
+    }
+
+    function updateRealClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('liveClock').innerText = `${hh}:${mm}:${ss}`;
+
+      const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
+      document.getElementById('liveDate').innerText = now.toLocaleDateString('tr-TR', options);
+    }
+
+    function renderTimer() {
+      const m = Math.floor(remainingSeconds / 60);
+      const s = remainingSeconds % 60;
+      const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      
+      const elTimer = document.getElementById('cntCountdown');
+      elTimer.innerText = timeStr;
+
+      // Renk ve uyarı animasyonu
+      if (remainingSeconds <= 300 && remainingSeconds > 0) {
+        elTimer.className = 'countdown-display danger-time';
+      } else if (remainingSeconds <= 600 && remainingSeconds > 0) {
+        elTimer.className = 'countdown-display warning-time';
+      } else {
+        elTimer.className = 'countdown-display';
+      }
+
+      // Progress bar
+      const progressPercent = (remainingSeconds / totalSeconds) * 100;
+      document.getElementById('cntProgressBar').style.width = Math.max(0, Math.min(100, progressPercent)) + '%';
+
+      // Çıkış yasağı durum güncellemesi
+      updateExitRestriction(totalSeconds - remainingSeconds);
+    }
+
+    function updateExitRestriction(elapsedSec) {
+      if (isFinished) return;
+
+      const elapsedMin = Math.floor(elapsedSec / 60);
+      const earlyExitMin = examConfig.earlyExitMinutes;
+      const lateExitMin = examConfig.lateExitMinutes;
+      const totalMin = examConfig.totalDurationMinutes;
+
+      const elCard = document.getElementById('cntExitStatus');
+      const elText = document.getElementById('txtExitStatusText');
+
+      // 1. ERKEN ÇIKIŞ YASAĞI DÖNEMİ
+      if (earlyExitMin > 0 && elapsedMin < earlyExitMin) {
+        const leftEarlyMin = earlyExitMin - elapsedMin;
+        elCard.className = 'exit-status-card status-forbidden';
+        elCard.innerHTML = `<span>🚫</span><span>SALONDAN ÇIKIŞ YASAKTIR (Yasağın Kalkmasına: ${leftEarlyMin} dk)</span>`;
+      } 
+      // 2. SON DAKİKALAR ÇIKIŞ YASAĞI
+      else if (lateExitMin > 0 && remainingSeconds <= (lateExitMin * 60) && remainingSeconds > 0) {
+        elCard.className = 'exit-status-card status-late-forbidden';
+        elCard.innerHTML = `<span>⚠️</span><span>SON ${lateExitMin} DAKİKA: SALONDAN ÇIKIŞLAR KAPATILMIŞTIR</span>`;
+      } 
+      // 3. ÇIKIŞ SERBEST DÖNEMİ
+      else {
+        const freeMinutesLeft = Math.max(0, Math.floor(remainingSeconds / 60) - lateExitMin);
+        elCard.className = 'exit-status-card status-allowed';
+        elCard.innerHTML = `<span>✅</span><span>ÇIKIŞ SERBESTTİR ${freeMinutesLeft > 0 ? '(Kalan Serbest Süre: ' + freeMinutesLeft + ' dk)' : ''}</span>`;
+      }
+    }
+
+    function finishExam() {
+      isFinished = true;
+      clearInterval(timerInterval);
+      playChime('finish');
+
+      document.getElementById('cntCountdown').innerText = "00:00";
+      document.getElementById('timerLabel').innerText = "SINAV SONLANDI";
+      document.getElementById('cntProgressBar').style.width = '0%';
+
+      const elCard = document.getElementById('cntExitStatus');
+      elCard.className = 'exit-status-card status-finished';
+      elCard.innerHTML = `<span>🛑</span><span>SINAV SONA ERMİŞTİR! KALEMLERİ BIRAKIN VE KAĞITLARI TESLİM EDİNİZ.</span>`;
+    }
+
+    // ==================== KONTROL VE KUMANDA EYLEMLERİ ====================
+
+    function toggleTimer() {
+      isPaused = !isPaused;
+      const btnIcon = document.getElementById('btnToggleIcon');
+      const btnText = document.getElementById('btnToggleText');
+      if (isPaused) {
+        btnIcon.innerText = '▶';
+        btnText.innerText = 'Devam Et';
+        document.getElementById('timerLabel').innerText = '⏸ SINAV DURAKLATILDI';
+      } else {
+        btnIcon.innerText = '⏸';
+        btnText.innerText = 'Duraklat';
+        document.getElementById('timerLabel').innerText = 'KALAN SINAV SÜRESİ';
+      }
+      broadcastState();
+    }
+
+    function addMinutes(min) {
+      remainingSeconds += (min * 60);
+      totalSeconds += (min * 60);
+      examConfig.totalDurationMinutes += min;
+      renderTimer();
+      setAnnouncementText(`Sınav süresine +${min} dakika ilave edilmiştir.`);
+      playChime('info');
+      broadcastState();
+    }
+
+    function finishExamEarly() {
+      if (confirm('Sınavı şimdi sonlandırmak istediğinizden emin misiniz?')) {
+        finishExam();
+        broadcastState();
+      }
+    }
+
+    function openAnnouncementModal() {
+      document.getElementById('announcementModal').classList.add('active');
+      document.getElementById('inpAnnouncement').focus();
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('announcementModal').classList.remove('active');
+    }
+
+    function sendAnnouncement() {
+      const text = document.getElementById('inpAnnouncement').value.trim();
+      if (text) {
+        setAnnouncementText(text);
+        playChime('info');
+        broadcastState();
+      }
+      closeAnnouncementModal();
+    }
+
+    function setAnnouncementText(text) {
+      const banner = document.getElementById('announcementBanner');
+      document.getElementById('txtAnnouncementText').innerText = text;
+      banner.classList.add('active');
+    }
+
+    function clearAnnouncement() {
+      document.getElementById('announcementBanner').classList.remove('active');
+      examConfig.announcement = "";
+      broadcastState();
+    }
+
+    function openSettingsModal() {
+      document.getElementById('cfgDuration').value = examConfig.totalDurationMinutes;
+      document.getElementById('cfgEarlyExit').value = examConfig.earlyExitMinutes;
+      document.getElementById('cfgLateExit').value = examConfig.lateExitMinutes;
+      document.getElementById('cfgRoom').value = examConfig.roomName;
+      document.getElementById('cfgCourse').value = examConfig.courseName;
+      document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function applySettings() {
+      const newDur = parseInt(document.getElementById('cfgDuration').value) || 45;
+      const newEarly = parseInt(document.getElementById('cfgEarlyExit').value) || 0;
+      const newLate = parseInt(document.getElementById('cfgLateExit').value) || 0;
+      const newRoom = document.getElementById('cfgRoom').value.trim() || 'Amfi';
+      const newCourse = document.getElementById('cfgCourse').value.trim() || 'Ders';
+
+      const diffSec = (newDur * 60) - totalSeconds;
+      totalSeconds = newDur * 60;
+      remainingSeconds = Math.max(0, remainingSeconds + diffSec);
+
+      examConfig.totalDurationMinutes = newDur;
+      examConfig.earlyExitMinutes = newEarly;
+      examConfig.lateExitMinutes = newLate;
+      examConfig.roomName = newRoom;
+      examConfig.courseName = newCourse;
+
+      applyConfigToUI();
+      renderTimer();
+      closeSettingsModal();
+      broadcastState();
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert("Tam ekran hatası: " + err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function toggleMute() {
+      soundMuted = !soundMuted;
+      document.getElementById('muteIcon').innerText = soundMuted ? '🔇' : '🔔';
+    }
+
+    // ==================== WEB AUDIO ZİL VE UYARI SESLERİ ====================
+    function playChime(type) {
+      if (soundMuted) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        if (type === 'start' || type === 'info') {
+          // Melodik iki tonlu yumuşak amfi zili
+          playTone(ctx, 523.25, 0.1, 0.4); // C5
+          setTimeout(() => playTone(ctx, 659.25, 0.15, 0.6), 250); // E5
+        } else if (type === 'warning') {
+          // Dikkat tonu
+          playTone(ctx, 440, 0.2, 0.5);
+          setTimeout(() => playTone(ctx, 440, 0.2, 0.5), 300);
+        } else if (type === 'finish') {
+          // Bitiş gongi
+          playTone(ctx, 392, 0.3, 0.8);
+          setTimeout(() => playTone(ctx, 329.63, 0.4, 1.2), 350);
+        }
+      } catch(e) {
+        console.log('Ses çalınamadı:', e);
+      }
+    }
+
+    function playTone(ctx, freq, vol, duration) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    }
+
+    // ==================== UZAKTAN EŞİTLEME ====================
+    function broadcastState() {
+      const state = {
+        action: 'STATE_UPDATE',
+        remainingSeconds,
+        totalSeconds,
+        isPaused,
+        isFinished,
+        examConfig
+      };
+      if (syncChannel) syncChannel.postMessage(state);
+      localStorage.setItem('kmyo_remote_command', JSON.stringify({ ...state, _ts: Date.now() }));
+    }
+
+    function handleRemoteCommand(cmd) {
+      if (!cmd || !cmd.action) return;
+      if (cmd.action === 'PAUSE') {
+        isPaused = true;
+        toggleTimer();
+      } else if (cmd.action === 'RESUME') {
+        isPaused = false;
+        toggleTimer();
+      } else if (cmd.action === 'ADD_TIME') {
+        addMinutes(cmd.minutes || 5);
+      } else if (cmd.action === 'ANNOUNCE') {
+        setAnnouncementText(cmd.text);
+      } else if (cmd.action === 'FINISH') {
+        finishExam();
+      }
+    }
+
+    // Fare hareketsiz kaldığında kürsü çubuğunu hafifçe saydamlaştır
+    let activityTimer = null;
+    const dock = document.getElementById('controlDock');
+    function resetActivityTimer() {
+      dock.classList.add('active');
+      clearTimeout(activityTimer);
+      activityTimer = setTimeout(() => {
+        dock.classList.remove('active');
+      }, 3500);
+    }
+    window.addEventListener('mousemove', resetActivityTimer);
+    window.addEventListener('touchstart', resetActivityTimer);
+
+    // Başlat
+    window.onload = init;
+  </script>
+</body>
+</html>
