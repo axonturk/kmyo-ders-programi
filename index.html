@@ -26,8 +26,14 @@
       --amfi3: #0284c7;
       --amfi4: #d97706;
       --ofis: #059669;
-      --exam-color: #dc2626;
-      --exam-bg: #fef2f2;
+      --vize-color: #dc2626;
+      --vize-bg: #fef2f2;
+      --final-color: #6d28d9;
+      --final-bg: #f5f3ff;
+      --but-color: #d97706;
+      --but-bg: #fffbeb;
+      --mazeret-color: #0f766e;
+      --mazeret-bg: #f0fdfa;
       --meeting-color: #8b5cf6;
       --meeting-bg: #f5f3ff;
       --warning: #f59e0b;
@@ -46,7 +52,10 @@
         --border: #334155;
         --live-bg: #064e3b;
         --warning-bg: #451a03;
-        --exam-bg: #450a0a;
+        --vize-bg: #450a0a;
+        --final-bg: #2e1065;
+        --but-bg: #451a03;
+        --mazeret-bg: #042f2e;
         --meeting-bg: #2e1065;
         --shadow: 0 4px 14px rgba(0,0,0,0.3);
       }
@@ -59,14 +68,36 @@
     .header {
       background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%);
       color: white;
-      padding: 20px 18px 16px;
+      padding: 18px 18px 16px;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
     .inst-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: 700; color: #93c5fd; }
-    .teacher-name { font-size: 19px; font-weight: 800; margin-top: 3px; letter-spacing: -0.3px; }
+    .teacher-name { font-size: 18px; font-weight: 800; margin-top: 2px; letter-spacing: -0.3px; }
+    .header-csv-btn {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 7px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s;
+    }
+    .header-csv-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.28); }
+
     .live-clock-bar {
       display: flex;
       justify-content: space-between;
@@ -153,7 +184,7 @@
       cursor: pointer;
     }
 
-    /* Yaklaşan Sınav Banner'ı (Ders programında görünen) */
+    /* Yaklaşan Sınav Banner'ı */
     .exam-reminder-banner {
       display: none;
       margin: 12px 16px 4px;
@@ -351,11 +382,19 @@
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
     }
 
-    /* SINAV KARTI STİLİ */
+    /* SINAV KARTLARI */
     .slot-card.exam-slot-card {
-      border: 2px solid var(--exam-color);
-      background: var(--exam-bg);
+      border: 2px solid var(--vize-color);
+      background: var(--vize-bg);
       box-shadow: 0 6px 18px rgba(220, 38, 38, 0.18);
+    }
+    .slot-card.exam-slot-card.final-exam-card {
+      border-color: var(--final-color);
+      background: var(--final-bg);
+    }
+    .slot-card.exam-slot-card.but-exam-card {
+      border-color: var(--but-color);
+      background: var(--but-bg);
     }
 
     /* TOPLANTI KARTI STİLİ */
@@ -427,7 +466,9 @@
     .room-amfi4 { background-color: var(--amfi4); }
     .room-ofis { background-color: var(--ofis); }
     .room-meeting { background-color: var(--meeting-color); }
-    .room-exam { background-color: var(--exam-color); }
+    .room-vize { background-color: var(--vize-color); }
+    .room-final { background-color: var(--final-color); }
+    .room-but { background-color: var(--but-color); }
 
     .course-title {
       font-size: 16px;
@@ -483,6 +524,36 @@
     }
     .section-view.active { display: flex; }
 
+    /* Sınav Tür Filtre Butonları */
+    .exam-type-filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 0 6px;
+    }
+    .exam-type-filter-bar::-webkit-scrollbar { display: none; }
+    .et-btn {
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .et-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .et-btn.et-vize.active { background: var(--vize-color); border-color: var(--vize-color); }
+    .et-btn.et-final.active { background: var(--final-color); border-color: var(--final-color); }
+    .et-btn.et-but.active { background: var(--but-color); border-color: var(--but-color); }
+
     .custom-form-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -513,7 +584,7 @@
       font-weight: 700;
       color: var(--text-muted);
     }
-    .form-input, .form-select {
+    .form-input, .form-select, .form-textarea {
       padding: 11px 12px;
       border-radius: 12px;
       border: 1px solid var(--border);
@@ -538,9 +609,7 @@
       gap: 8px;
       margin-top: 4px;
     }
-    .btn-submit-exam {
-      background: var(--exam-color);
-    }
+    .btn-submit-exam { background: var(--vize-color); }
 
     .item-card {
       background: var(--card-bg);
@@ -553,16 +622,26 @@
       gap: 8px;
       position: relative;
     }
-    .item-card.exam-item {
-      border-left: 4px solid var(--exam-color);
+    .item-card.exam-item-vize { border-left: 5px solid var(--vize-color); }
+    .item-card.exam-item-final { border-left: 5px solid var(--final-color); }
+    .item-card.exam-item-but { border-left: 5px solid var(--but-color); }
+    .item-card.exam-item-mazeret { border-left: 5px solid var(--mazeret-color); }
+    .item-card.meeting-item { border-left: 5px solid var(--meeting-color); }
+    .item-card.past-item { opacity: 0.6; background: rgba(0,0,0,0.02); }
+
+    .badge-type {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .item-card.meeting-item {
-      border-left: 4px solid var(--meeting-color);
-    }
-    .item-card.past-item {
-      opacity: 0.6;
-      background: rgba(0,0,0,0.02);
-    }
+    .badge-vize { background: #fee2e2; color: #dc2626; }
+    .badge-final { background: #f3e8ff; color: #6d28d9; }
+    .badge-but { background: #fef3c7; color: #b45309; }
+    .badge-mazeret { background: #ccfbf1; color: #0f766e; }
+
     .ic-header {
       display: flex;
       justify-content: space-between;
@@ -636,6 +715,81 @@
       background: var(--primary);
       color: white;
       border-color: var(--primary);
+    }
+
+    /* ==================== CSV VE VERİ YÖNETİM MODALI ==================== */
+    .csv-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      z-index: 500;
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .csv-modal-overlay.active { display: flex; }
+    .csv-modal-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+      animation: popIn 0.25s ease-out;
+    }
+    .csv-tab-bar {
+      display: flex;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 14px;
+      gap: 6px;
+    }
+    .csv-tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .csv-tab-btn.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .csv-box {
+      border: 1.5px dashed var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg);
+    }
+    .btn-template-download {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(29, 78, 216, 0.3);
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     /* MODAL (DERS TAŞIMA) */
@@ -714,7 +868,7 @@
       cursor: pointer;
     }
 
-    /* ==================== BÜYÜK UYARI MODALI (SINAV VE TOPLANTI İÇİN) ==================== */
+    /* BÜYÜK UYARI MODALI */
     .big-alert-overlay {
       display: none;
       position: fixed;
@@ -741,9 +895,6 @@
       text-align: center;
       animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .big-alert-card.exam-alert-border {
-      border-color: var(--exam-color);
-    }
     @keyframes popIn {
       from { transform: scale(0.8); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -761,11 +912,6 @@
       margin: 0 auto;
       border: 3px solid #bfdbfe;
       animation: bounce 2s infinite;
-    }
-    .big-alert-icon.exam-icon-bg {
-      background: #fef2f2;
-      border-color: #fecaca;
-      color: var(--exam-color);
     }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
     .big-alert-tag {
@@ -835,8 +981,15 @@
 
   <!-- Üst Başlık -->
   <div class="header">
-    <div class="inst-title">Hatay MKÜ • Kırıkhan Meslek Yüksekokulu</div>
-    <div class="teacher-name">Öğr. Gör. Fatih Akman ÇAKMAK</div>
+    <div class="header-top">
+      <div>
+        <div class="inst-title">Hatay MKÜ • Kırıkhan Meslek Yüksekokulu</div>
+        <div class="teacher-name">Öğr. Gör. Fatih Akman ÇAKMAK</div>
+      </div>
+      <button class="header-csv-btn" onclick="openCsvModal()">
+        ⚙️ CSV Yükle & Şablon
+      </button>
+    </div>
     <div class="live-clock-bar">
       <span id="currentDateStr">Tarih yükleniyor...</span>
       <span id="currentTimeStr" style="font-weight: 700; font-family: monospace;">00:00:00</span>
@@ -865,9 +1018,9 @@
     <button onclick="installPWA()">YÜKLE</button>
   </div>
 
-  <!-- Yaklaşan Sınav Bildirim Çubuğu (Ders programında 1-2 gün önceden görünen) -->
+  <!-- Yaklaşan Sınav Bildirim Çubuğu -->
   <div class="exam-reminder-banner" id="examReminderBanner">
-    <div class="erb-tag">🚨 YAKLAŞAN SINAV HATIRLATMASI</div>
+    <div class="erb-tag" id="erbTag">🚨 YAKLAŞAN SINAV HATIRLATMASI</div>
     <div class="erb-title" id="erbTitle">Web Güvenliği Sınavı</div>
     <div class="erb-details">
       <span id="erbDate">📅 09.11.2026</span>
@@ -888,7 +1041,7 @@
     </div>
   </div>
 
-  <!-- Değişiklik Bildirim Çubuğu (Taşınan dersler için) -->
+  <!-- Değişiklik Bildirim Çubuğu -->
   <div class="changes-banner" id="changesBanner">
     <span id="changesText">⚡ Taşınmış dersleriniz var.</span>
     <button onclick="resetAllOverrides()">Tümünü Sıfırla</button>
@@ -914,7 +1067,7 @@
 
     <!-- Görünüm Seçenekleri -->
     <div class="view-toggle-bar">
-      <span id="daySummaryText">Ders ve Sınav Akışı</span>
+      <span id="daySummaryText">Ders ve Faaliyet Akışı</span>
       <label style="display:flex; align-items:center; gap:6px;">
         Görünüm:
         <select class="view-select" id="conflictFilter" onchange="renderSlots()">
@@ -937,11 +1090,28 @@
 
   <!-- ==================== GÖRÜNÜM 2: SINAVLAR SEKMESİ ==================== -->
   <div class="section-view" id="viewExams">
+    <!-- Sınav Tür Filtreleri -->
+    <div class="exam-type-filter-bar">
+      <button class="et-btn active" id="btnFilterAll" onclick="filterExams('Tümü')">Tüm Sınavlar (<span id="cntAllExams">7</span>)</button>
+      <button class="et-btn et-vize" id="btnFilterVize" onclick="filterExams('Vize')">🔴 Vizeler (<span id="cntVizeExams">7</span>)</button>
+      <button class="et-btn et-final" id="btnFilterFinal" onclick="filterExams('Final')">🟣 Finaller (<span id="cntFinalExams">0</span>)</button>
+      <button class="et-btn et-but" id="btnFilterBut" onclick="filterExams('Bütünleme')">🟠 Bütünlemeler (<span id="cntButExams">0</span>)</button>
+    </div>
+
     <!-- Sınav Ekleme Formu -->
     <div class="custom-form-card">
-      <div class="cfc-title" style="color:var(--exam-color);">📝 Yeni Sınav Ekle</div>
+      <div class="cfc-title" style="color:var(--vize-color);">📝 Yeni Sınav Oturumu Ekle</div>
       
       <div class="form-row">
+        <div class="form-group" style="flex:1.2;">
+          <label class="form-label">Sınav Türü *</label>
+          <select class="form-select" id="inpExamType">
+            <option value="Vize">🔴 Vize Sınavı</option>
+            <option value="Final">🟣 Final Sınavı</option>
+            <option value="Bütünleme">🟠 Bütünleme Sınavı</option>
+            <option value="Mazeret">🔵 Mazeret Sınavı</option>
+          </select>
+        </div>
         <div class="form-group" style="flex:2;">
           <label class="form-label">Ders Adı *</label>
           <input type="text" class="form-input" id="inpExamTitle" placeholder="Örn: Web Güvenliği">
@@ -960,10 +1130,10 @@
         <div class="form-group">
           <label class="form-label">Derslik / Amfi *</label>
           <select class="form-select" id="inpExamLocation">
-            <option value="74 KMYO Amfi-4">[74 KMYO Amfi-4] Amfi-4</option>
-            <option value="74 KMYO Amfi-3">[74 KMYO Amfi-3] Amfi-3</option>
-            <option value="74 KMYO Amfi-2">[74 KMYO Amfi-2] Amfi-2</option>
-            <option value="74 KMYO Amfi-1">[74 KMYO Amfi-1] Amfi-1</option>
+            <option value="[74 KMYO Amfi-4] Amfi-4">[74 KMYO Amfi-4] Amfi-4</option>
+            <option value="[74 KMYO Amfi-3] Amfi-3">[74 KMYO Amfi-3] Amfi-3</option>
+            <option value="[74 KMYO Amfi-2] Amfi-2">[74 KMYO Amfi-2] Amfi-2</option>
+            <option value="[74 KMYO Amfi-1] Amfi-1">[74 KMYO Amfi-1] Amfi-1</option>
           </select>
         </div>
       </div>
@@ -985,10 +1155,10 @@
     <!-- Aktif / Kayıtlı Sınavlar Listesi -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
       <div style="font-size:15px; font-weight:800; color:var(--text);">
-        📋 Tanımlı Sınav Takvimi
+        📋 Sınav Takvimi
       </div>
-      <button onclick="restoreDefaultExams()" style="background:none; border:none; font-size:11px; color:var(--primary); font-weight:700; cursor:pointer;">
-        🔄 Resmi Programı Yenile
+      <button onclick="openCsvModal('exam')" style="background:none; border:none; font-size:12px; color:var(--primary); font-weight:700; cursor:pointer;">
+        📥 CSV ile Toplu Yükle
       </button>
     </div>
     <div id="examsListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
@@ -996,7 +1166,6 @@
 
   <!-- ==================== GÖRÜNÜM 3: TOPLANTILAR SEKMESİ ==================== -->
   <div class="section-view" id="viewMeetings">
-    <!-- Toplantı Ekleme Formu -->
     <div class="custom-form-card">
       <div class="cfc-title" style="color:var(--meeting-color);">🏛️ Yeni Toplantı Ekle</div>
       
@@ -1030,11 +1199,118 @@
       <button class="btn-submit-action" style="background:var(--meeting-color);" onclick="saveNewMeeting()">💾 Toplantıyı Kaydet</button>
     </div>
 
-    <!-- Aktif / Yaklaşan Toplantılar -->
     <div style="font-size:15px; font-weight:800; color:var(--text); margin-top:6px;">
       📌 Kayıtlı Toplantılarım
     </div>
     <div id="meetingsListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
+  <!-- ==================== CSV YÖNETİM MODALI (1. SEÇENEK: 2 AYRI ŞABLON) ==================== -->
+  <div class="csv-modal-overlay" id="csvManagerModal">
+    <div class="csv-modal-card">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ CSV Şablon & Veri Yükleme</div>
+        <button class="modal-close" onclick="closeCsvModal()">&times;</button>
+      </div>
+
+      <!-- CSV Sekmeleri: [Sınav Takvimi] | [Ders Programı] -->
+      <div class="csv-tab-bar">
+        <button class="csv-tab-btn active" id="csvTabBtnExam" onclick="switchCsvSubTab('exam')">📝 Sınav Takvimi CSV</button>
+        <button class="csv-tab-btn" id="csvTabBtnSchedule" onclick="switchCsvSubTab('schedule')">📚 Ders Programı CSV</button>
+      </div>
+
+      <!-- 1. SINAV TAKVİMİ CSV PANELİ -->
+      <div id="csvPanelExam" style="display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
+          Excel'de doldurduğunuz Vize, Final veya Bütünleme sınav programını CSV olarak yükleyin. Yeni program yüklendiğinde eski sınavlar temizlenir.
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-template-download" style="flex:1;" onclick="downloadExamCsvTemplate()">
+            📥 Boş Sınav Şablonu İndir (.csv)
+          </button>
+          <button class="btn-template-download" style="flex:1; background:var(--bg); border-color:var(--border); color:var(--text);" onclick="downloadCurrentExamsCsv()">
+            💾 Mevcut Sınavları İndir (Yedek)
+          </button>
+        </div>
+
+        <div class="csv-box">
+          <div style="font-weight:700; font-size:13px;">📤 Sınav CSV Dosyası Yükle:</div>
+          <input type="file" id="examCsvFileInput" accept=".csv, .txt" class="form-input" style="padding:8px;" onchange="handleExamFileSelect(event)">
+          
+          <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+            <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Varsayılan Sınav Türü:</label>
+            <select class="form-select" id="csvExamDefaultType" style="padding:6px 10px; font-size:12px;">
+              <option value="Otomatik">CSV'deki Türe Göre (Vize/Final/Büt)</option>
+              <option value="Vize">Tümü Vize Olarak Kaydedilsin</option>
+              <option value="Final">Tümü Final Olarak Kaydedilsin</option>
+              <option value="Bütünleme">Tümü Bütünleme Olarak Kaydedilsin</option>
+            </select>
+          </div>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:#dc2626; cursor:pointer;">
+            <input type="checkbox" id="chkCleanOldExams" checked>
+            <span>Yeni sınavlar yüklenirken eski sınav takvimi silinsin (Önerilen)</span>
+          </label>
+
+          <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-top:4px;">VEYA Excel'den Kopyalayıp Buraya Yapıştırın:</div>
+          <textarea class="form-textarea" id="examCsvTextarea" rows="4" placeholder="Tur;Tarih;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik&#10;Vize;09.11.2026;09:00;10:00;74322301;Web Güvenliği;[74 KMYO Amfi-4] Amfi-4"></textarea>
+
+          <button class="btn-submit-action btn-submit-exam" onclick="processExamCsvUpload()">
+            🚀 Sınav Takvimini İçe Aktar ve Uygula
+          </button>
+        </div>
+
+        <div id="undoExamBackupBox" style="display:none; justify-content:space-between; align-items:center; background:#fef2f2; border:1px solid #fecaca; padding:10px 14px; border-radius:12px;">
+          <span style="font-size:12px; color:#b91c1c; font-weight:700;">Son silinen sınav takvimi yedeği mevcut.</span>
+          <button onclick="restoreBackupExams()" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;">
+            ↩ Yedeği Geri Al
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. DERS PROGRAMI CSV PANELİ -->
+      <div id="csvPanelSchedule" style="display:none; flex-direction:column; gap:14px;">
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
+          Yeni döneme ait haftalık ders programını Excel'den CSV olarak yükleyin. Yeni program yüklendiğinde eski ders programı ve taşınan dersler temizlenir.
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-template-download" style="flex:1;" onclick="downloadScheduleCsvTemplate()">
+            📥 Boş Ders Şablonu İndir (.csv)
+          </button>
+          <button class="btn-template-download" style="flex:1; background:var(--bg); border-color:var(--border); color:var(--text);" onclick="downloadCurrentScheduleCsv()">
+            💾 Mevcut Programı İndir (Yedek)
+          </button>
+        </div>
+
+        <div class="csv-box">
+          <div style="font-weight:700; font-size:13px;">📤 Ders Programı CSV Dosyası Yükle:</div>
+          <input type="file" id="scheduleCsvFileInput" accept=".csv, .txt" class="form-input" style="padding:8px;" onchange="handleScheduleFileSelect(event)">
+          
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:#dc2626; cursor:pointer;">
+            <input type="checkbox" id="chkCleanOldSchedule" checked>
+            <span>Yeni program yüklenirken eski dersler ve taşınanlar silinsin (Önerilen)</span>
+          </label>
+
+          <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-top:4px;">VEYA Excel'den Kopyalayıp Buraya Yapıştırın:</div>
+          <textarea class="form-textarea" id="scheduleCsvTextarea" rows="4" placeholder="Gun;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik&#10;Pazartesi;08:15;09:00;74322301;Web Güvenliği;74 KMYO Amfi-3"></textarea>
+
+          <button class="btn-submit-action" onclick="processScheduleCsvUpload()">
+            🚀 Ders Programını İçe Aktar ve Başlat
+          </button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+          <button onclick="restoreOfficialBaseSchedule()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer;">
+            🔄 Resmi Fabrika Programına Sıfırla
+          </button>
+          <button id="btnRestoreScheduleBackup" onclick="restoreBackupSchedule()" style="display:none; background:#fee2e2; color:#b91c1c; border:none; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">
+            ↩ Son Silineni Geri Al
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- DERS TAŞIMA MODAL PENCERESİ -->
@@ -1111,11 +1387,11 @@
     </div>
   </div>
 
-  <!-- ==================== BÜYÜK UYARI PENCERESİ (1 GÜN ÖNCE 22:00) ==================== -->
+  <!-- BÜYÜK UYARI PENCERESİ (1 GÜN ÖNCE 22:00) -->
   <div class="big-alert-overlay" id="universalBigAlertModal">
     <div class="big-alert-card" id="universalBigAlertCard">
       <div class="big-alert-icon" id="bamIcon">📝</div>
-      <div class="big-alert-tag" id="bamTag">🚨 ÖNEMLİ SINAV HATIRLATMASI</div>
+      <div class="big-alert-tag" id="bamTag">🚨 ÖNEMLİ VİZE SINAVI HATIRLATMASI</div>
       <div class="big-alert-title" id="bamTitle">Web Güvenliği Sınavı</div>
       
       <div class="big-alert-details-box">
@@ -1193,8 +1469,8 @@
       }
     }
 
-    // 3. Sabit Orijinal Haftalık Ders Programı
-    const baseScheduleData = {
+    // 3. Sabit Orijinal Haftalık Ders Programı (Fabrika Ayarı)
+    const officialBaseScheduleData = {
       1: {
         name: "Pazartesi",
         slots: [
@@ -1247,7 +1523,10 @@
 
     const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma" };
 
-    function getRoomClass(roomName) {
+    function getRoomClass(roomName, examType) {
+      if (examType === 'Vize') return 'room-vize';
+      if (examType === 'Final') return 'room-final';
+      if (examType === 'Bütünleme') return 'room-but';
       if (!roomName) return 'room-amfi3';
       if (roomName.includes('Amfi-1')) return 'room-amfi1';
       if (roomName.includes('Amfi-2')) return 'room-amfi2';
@@ -1255,105 +1534,40 @@
       if (roomName.includes('Amfi-4')) return 'room-amfi4';
       if (roomName.includes('Ofis')) return 'room-ofis';
       if (roomName.includes('Toplantı') || roomName.includes('Müdür')) return 'room-meeting';
-      if (roomName.includes('Sınav') || roomName.includes('Vize')) return 'room-exam';
       return 'room-amfi3';
     }
 
-    // Kullanıcının Gönderdiği Resmi Sınav Programı (09.11.2026 - 13.11.2026)
+    // Kullanıcının Gönderdiği Resmi Sınav Programı (İlk Kurulum Değerleri)
     const officialDefaultExams = [
-      {
-        id: "exam_1",
-        code: "74322301",
-        title: "Web Güvenliği",
-        date: "2026-11-09",
-        startTime: "09:00",
-        endTime: "10:00",
-        location: "[74 KMYO Amfi-4] Amfi-4",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_2",
-        code: "74112335",
-        title: "Yönlendiriciler I",
-        date: "2026-11-09",
-        startTime: "14:00",
-        endTime: "15:00",
-        location: "[74 KMYO Amfi-4] Amfi-4",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_3",
-        code: "74192323",
-        title: "İleri Ağ Yönetimi",
-        date: "2026-11-11",
-        startTime: "10:30",
-        endTime: "11:30",
-        location: "[74 KMYO Amfi-4] Amfi-4",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_4",
-        code: "74191113",
-        title: "Ağ Teknolojilerine Giriş",
-        date: "2026-11-11",
-        startTime: "14:00",
-        endTime: "15:00",
-        location: "[74 KMYO Amfi-3] Amfi-3",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_5",
-        code: "74112309",
-        title: "Bilgi ve Ağ Güvenliği",
-        date: "2026-11-12",
-        startTime: "09:00",
-        endTime: "10:00",
-        location: "[74 KMYO Amfi-3] Amfi-3",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_6",
-        code: "74112317",
-        title: "Kablolama",
-        date: "2026-11-12",
-        startTime: "11:00",
-        endTime: "12:00",
-        location: "[74 KMYO Amfi-3] Amfi-3",
-        alertDismissed: false,
-        snoozeUntil: null
-      },
-      {
-        id: "exam_7",
-        code: "74192329",
-        title: "Güvenlik Duvarı Çözümleri",
-        date: "2026-11-13",
-        startTime: "09:00",
-        endTime: "10:00",
-        location: "[74 KMYO Amfi-3] Amfi-3",
-        alertDismissed: false,
-        snoozeUntil: null
-      }
+      { id: "exam_1", type: "Vize", code: "74322301", title: "Web Güvenliği", date: "2026-11-09", startTime: "09:00", endTime: "10:00", location: "[74 KMYO Amfi-4] Amfi-4", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_2", type: "Vize", code: "74112335", title: "Yönlendiriciler I", date: "2026-11-09", startTime: "14:00", endTime: "15:00", location: "[74 KMYO Amfi-4] Amfi-4", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_3", type: "Vize", code: "74192323", title: "İleri Ağ Yönetimi", date: "2026-11-11", startTime: "10:30", endTime: "11:30", location: "[74 KMYO Amfi-4] Amfi-4", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_4", type: "Vize", code: "74191113", title: "Ağ Teknolojilerine Giriş", date: "2026-11-11", startTime: "14:00", endTime: "15:00", location: "[74 KMYO Amfi-3] Amfi-3", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_5", type: "Vize", code: "74112309", title: "Bilgi ve Ağ Güvenliği", date: "2026-11-12", startTime: "09:00", endTime: "10:00", location: "[74 KMYO Amfi-3] Amfi-3", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_6", type: "Vize", code: "74112317", title: "Kablolama", date: "2026-11-12", startTime: "11:00", endTime: "12:00", location: "[74 KMYO Amfi-3] Amfi-3", alertDismissed: false, snoozeUntil: null },
+      { id: "exam_7", type: "Vize", code: "74192329", title: "Güvenlik Duvarı Çözümleri", date: "2026-11-13", startTime: "09:00", endTime: "10:00", location: "[74 KMYO Amfi-3] Amfi-3", alertDismissed: false, snoozeUntil: null }
     ];
 
-    // 4. Veri Yönetimi (LocalStorage)
+    // 4. Veri Yönetimi & Dinamik Program
+    let customScheduleData = JSON.parse(localStorage.getItem('kmyo_custom_schedule') || 'null');
     let movedOverrides = JSON.parse(localStorage.getItem('kmyo_moved_overrides') || '{}');
     let meetings = JSON.parse(localStorage.getItem('kmyo_meetings') || '[]');
     let exams = JSON.parse(localStorage.getItem('kmyo_exams') || 'null');
     
-    // Sınavlar LocalStorage'da yoksa varsayılan resmi sınavları ata
     if (!exams || !Array.isArray(exams) || exams.length === 0) {
       exams = JSON.parse(JSON.stringify(officialDefaultExams));
       localStorage.setItem('kmyo_exams', JSON.stringify(exams));
     }
 
+    // Aktif Kullanılan Temel Ders Programı
+    function getActiveBaseSchedule() {
+      return customScheduleData || officialBaseScheduleData;
+    }
+
     let activeDay = 1;
     let selectedSlotToMove = null;
-    let currentActiveBigAlert = null; // { type: 'exam' | 'meeting', data: obj }
+    let currentActiveBigAlert = null;
+    let currentExamTypeFilter = 'Tümü';
 
     function saveOverrides() {
       localStorage.setItem('kmyo_moved_overrides', JSON.stringify(movedOverrides));
@@ -1375,13 +1589,6 @@
       checkAllReminders();
     }
 
-    function restoreDefaultExams() {
-      if (confirm('Kayıtlı sınavlar resmi MKÜ KMYO sınav takvimine sıfırlansın mı?')) {
-        exams = JSON.parse(JSON.stringify(officialDefaultExams));
-        saveExams();
-      }
-    }
-
     function updateBadges() {
       const activeMeetings = meetings.filter(m => !isItemExpired(m)).length;
       const activeExams = exams.filter(e => !isItemExpired(e)).length;
@@ -1391,6 +1598,25 @@
 
       const eBadge = document.getElementById('examBadgeCnt');
       if (eBadge) eBadge.innerText = activeExams;
+
+      // Sınav filtre sayaçları
+      const vizeCnt = exams.filter(e => (e.type || 'Vize') === 'Vize').length;
+      const finalCnt = exams.filter(e => e.type === 'Final').length;
+      const butCnt = exams.filter(e => e.type === 'Bütünleme').length;
+      
+      const elAll = document.getElementById('cntAllExams'); if (elAll) elAll.innerText = exams.length;
+      const elVize = document.getElementById('cntVizeExams'); if (elVize) elVize.innerText = vizeCnt;
+      const elFinal = document.getElementById('cntFinalExams'); if (elFinal) elFinal.innerText = finalCnt;
+      const elBut = document.getElementById('cntButExams'); if (elBut) elBut.innerText = butCnt;
+
+      // Yedek durum butonları
+      const hasExamBackup = !!localStorage.getItem('kmyo_backup_exams');
+      const boxExamBackup = document.getElementById('undoExamBackupBox');
+      if (boxExamBackup) boxExamBackup.style.display = hasExamBackup ? 'flex' : 'none';
+
+      const hasSchedBackup = !!localStorage.getItem('kmyo_backup_schedule');
+      const btnSchedBackup = document.getElementById('btnRestoreScheduleBackup');
+      if (btnSchedBackup) btnSchedBackup.style.display = hasSchedBackup ? 'inline-block' : 'none';
     }
 
     function switchMainView(viewName) {
@@ -1402,7 +1628,6 @@
       const tabExam = document.getElementById('tabNavExams');
       const tabMeet = document.getElementById('tabNavMeetings');
 
-      // Gizle
       scheduleView.style.display = 'none';
       examsView.classList.remove('active');
       meetingsView.classList.remove('active');
@@ -1435,7 +1660,18 @@
 
     // ==================== SINAV YÖNETİMİ MANTIĞI ====================
 
+    function filterExams(type) {
+      currentExamTypeFilter = type;
+      document.querySelectorAll('.et-btn').forEach(btn => btn.classList.remove('active'));
+      if (type === 'Vize') document.getElementById('btnFilterVize')?.classList.add('active');
+      else if (type === 'Final') document.getElementById('btnFilterFinal')?.classList.add('active');
+      else if (type === 'Bütünleme') document.getElementById('btnFilterBut')?.classList.add('active');
+      else document.getElementById('btnFilterAll')?.classList.add('active');
+      renderExamsList();
+    }
+
     function saveNewExam() {
+      const type = document.getElementById('inpExamType').value;
       const title = document.getElementById('inpExamTitle').value.trim();
       const code = document.getElementById('inpExamCode').value.trim() || 'SINAV';
       const date = document.getElementById('inpExamDate').value;
@@ -1450,6 +1686,7 @@
 
       const newExam = {
         id: 'exam_' + Date.now(),
+        type: type,
         code: code,
         title: title,
         date: date,
@@ -1467,7 +1704,7 @@
       document.getElementById('inpExamTitle').value = '';
       document.getElementById('inpExamCode').value = '';
 
-      alert('Sınav takvime başarıyla eklendi! 1 gün önceden büyük ekran uyarısı ve ders programı hatırlatması devreye girecek.');
+      alert(`${type} sınavı başarıyla takvime eklendi!`);
     }
 
     function deleteExam(id) {
@@ -1481,29 +1718,41 @@
       const container = document.getElementById('examsListContainer');
       container.innerHTML = '';
 
-      if (exams.length === 0) {
+      let filteredExams = exams;
+      if (currentExamTypeFilter !== 'Tümü') {
+        filteredExams = exams.filter(e => (e.type || 'Vize') === currentExamTypeFilter);
+      }
+
+      if (filteredExams.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="padding:30px;">
-            <h3>Henüz Kayıtlı Sınav Yok</h3>
-            <p>Yukarıdaki formu kullanarak yeni sınav ekleyebilir veya "Resmi Programı Yenile"ye basabilirsiniz.</p>
+            <h3>Kayıtlı ${currentExamTypeFilter === 'Tümü' ? '' : currentExamTypeFilter} Sınavı Bulunmuyor</h3>
+            <p>Yukarıdaki formu veya CSV yükleyicisini kullanarak yeni sınavlar ekleyebilirsiniz.</p>
           </div>
         `;
         return;
       }
 
-      exams.sort((a, b) => (a.date + ' ' + a.startTime).localeCompare(b.date + ' ' + b.startTime));
+      filteredExams.sort((a, b) => (a.date + ' ' + a.startTime).localeCompare(b.date + ' ' + b.startTime));
 
       const now = new Date();
 
-      exams.forEach(e => {
+      filteredExams.forEach(e => {
         const expired = isItemExpired(e);
+        const examType = e.type || 'Vize';
+        
+        let typeBadgeClass = 'badge-vize';
+        let cardTypeClass = 'exam-item-vize';
+        if (examType === 'Final') { typeBadgeClass = 'badge-final'; cardTypeClass = 'exam-item-final'; }
+        else if (examType === 'Bütünleme') { typeBadgeClass = 'badge-but'; cardTypeClass = 'exam-item-but'; }
+        else if (examType === 'Mazeret') { typeBadgeClass = 'badge-mazeret'; cardTypeClass = 'exam-item-mazeret'; }
+
         const card = document.createElement('div');
-        card.className = 'item-card exam-item' + (expired ? ' past-item' : '');
+        card.className = `item-card ${cardTypeClass}` + (expired ? ' past-item' : '');
 
         const [y, mo, d] = e.date.split('-');
         const dateStr = `${d}.${mo}.${y}`;
 
-        // Kalan gün hesabı
         const [sh, sm] = e.startTime.split(':').map(Number);
         const startDt = new Date(Number(y), Number(mo) - 1, Number(d), sh, sm, 0);
         const diffMs = startDt - now;
@@ -1522,11 +1771,14 @@
 
         card.innerHTML = `
           <div class="ic-header">
-            <span class="ic-time" style="color:var(--exam-color);">⏱ ${e.startTime} - ${e.endTime}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge-type ${typeBadgeClass}">${examType}</span>
+              <span class="ic-time">⏱ ${e.startTime} - ${e.endTime}</span>
+            </div>
             <div>${countdownPill}</div>
           </div>
           <div class="ic-title">📝 ${e.title}</div>
-          <div class="ic-sub">🏷️ Kod: <b>${e.code}</b> &nbsp;|&nbsp; 📍 Yer: <b>${e.location}</b></div>
+          <div class="ic-sub">🏷️ Kod: <b>${e.code}</b> &nbsp;|&nbsp; 📍 Salon: <b>${e.location}</b></div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--border); padding-top:8px;">
             <span style="font-size:11px; color:var(--text-muted);">
               📅 <b>${dateStr}</b> &nbsp;•&nbsp; ${e.alertDismissed ? '🔕 Uyarı Kapatıldı' : (e.snoozeUntil ? '⏰ Ertelendi' : '🔔 1 Gün Önce Alarmı')}
@@ -1536,6 +1788,386 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    // ==================== CSV İÇE / DIŞA AKTARMA VE ŞABLON YÖNETİMİ ====================
+
+    function openCsvModal(tab = 'exam') {
+      document.getElementById('csvManagerModal').classList.add('active');
+      switchCsvSubTab(tab);
+      updateBadges();
+    }
+
+    function closeCsvModal() {
+      document.getElementById('csvManagerModal').classList.remove('active');
+    }
+
+    function switchCsvSubTab(subTab) {
+      const btnExam = document.getElementById('csvTabBtnExam');
+      const btnSchedule = document.getElementById('csvTabBtnSchedule');
+      const panelExam = document.getElementById('csvPanelExam');
+      const panelSchedule = document.getElementById('csvPanelSchedule');
+
+      if (subTab === 'schedule') {
+        btnSchedule.classList.add('active');
+        btnExam.classList.remove('active');
+        panelSchedule.style.display = 'flex';
+        panelExam.style.display = 'none';
+      } else {
+        btnExam.classList.add('active');
+        btnSchedule.classList.remove('active');
+        panelExam.style.display = 'flex';
+        panelSchedule.style.display = 'none';
+      }
+    }
+
+    // Dosyayı İndirme Yardımcısı (UTF-8 BOM ile Excel Türkçe Uyumlu)
+    function downloadCsvFile(filename, content) {
+      const BOM = "\uFEFF";
+      const blob = new Blob([BOM + content], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // 1. ŞABLON İNDİRME: Sınav Takvimi
+    function downloadExamCsvTemplate() {
+      const sample = [
+        "Tur;Tarih;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik",
+        "Vize;09.11.2026;09:00;10:00;74322301;Web Güvenliği;[74 KMYO Amfi-4] Amfi-4",
+        "Vize;09.11.2026;14:00;15:00;74112335;Yönlendiriciler I;[74 KMYO Amfi-4] Amfi-4",
+        "Vize;11.11.2026;10:30;11:30;74192323;İleri Ağ Yönetimi;[74 KMYO Amfi-4] Amfi-4",
+        "Final;04.01.2027;09:00;10:00;74322301;Web Güvenliği;[74 KMYO Amfi-4] Amfi-4",
+        "Bütünleme;18.01.2027;09:00;10:00;74322301;Web Güvenliği;[74 KMYO Amfi-4] Amfi-4"
+      ].join("\r\n");
+      downloadCsvFile("KMYO_Sinav_Takvimi_Sablon.csv", sample);
+    }
+
+    // Mevcut Sınavları CSV İndir (Yedek Alma)
+    function downloadCurrentExamsCsv() {
+      const rows = ["Tur;Tarih;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik"];
+      exams.forEach(e => {
+        const [y, m, d] = e.date.split('-');
+        const dateFormatted = `${d}.${m}.${y}`;
+        rows.push(`${e.type || 'Vize'};${dateFormatted};${e.startTime};${e.endTime};${e.code};${e.title};${e.location}`);
+      });
+      downloadCsvFile("KMYO_Mevcut_Sinav_Takvimi_Yedek.csv", rows.join("\r\n"));
+    }
+
+    // 2. ŞABLON İNDİRME: Ders Programı
+    function downloadScheduleCsvTemplate() {
+      const sample = [
+        "Gun;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik",
+        "Pazartesi;08:15;09:00;74322301;Web Güvenliği;74 KMYO Amfi-3",
+        "Pazartesi;09:15;10:00;74322301;Web Güvenliği;74 KMYO Amfi-3",
+        "Pazartesi;12:00;13:00;OFIS;OFİS / DANIŞMANLIK;Ofis",
+        "Pazartesi;13:15;14:00;74112335;Yönlendiriciler I;74 KMYO Amfi-2",
+        "Çarşamba;08:15;09:00;74192323;İleri Ağ Yönetimi;74 KMYO Amfi-3",
+        "Çarşamba;13:15;14:00;74191113;Ağ Teknolojilerine Giriş;74 KMYO Amfi-3",
+        "Perşembe;08:15;09:00;74112309;Bilgi ve Ağ Güvenliği;74 KMYO Amfi-3",
+        "Cuma;08:15;09:00;74192329;Güvenlik Duvarı Çözümleri;74 KMYO Amfi-4"
+      ].join("\r\n");
+      downloadCsvFile("KMYO_Ders_Programi_Sablon.csv", sample);
+    }
+
+    // Mevcut Ders Programını CSV İndir
+    function downloadCurrentScheduleCsv() {
+      const sched = getActiveBaseSchedule();
+      const rows = ["Gun;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik"];
+      for (let dayNum = 1; dayNum <= 5; dayNum++) {
+        const slots = sched[dayNum]?.slots || [];
+        const gName = dayNames[dayNum];
+        slots.forEach(s => {
+          rows.push(`${gName};${s.start};${s.end};${s.code};${s.title};${s.room}`);
+        });
+      }
+      downloadCsvFile("KMYO_Mevcut_Ders_Programi_Yedek.csv", rows.join("\r\n"));
+    }
+
+    // Akıllı CSV Parser (Noktalı virgül, virgül ve sekme uyumlu)
+    function parseCsvToRows(text) {
+      if (!text || !text.trim()) return [];
+      const lines = text.trim().split(/\r\n|\n|\r/);
+      const rows = [];
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        let sep = ';';
+        if (line.includes('\t')) sep = '\t';
+        else if (line.includes(';') && !line.includes(',')) sep = ';';
+        else if (line.includes(',') && !line.includes(';')) sep = ',';
+        
+        const cols = line.split(sep).map(c => c.trim().replace(/^["']|["']$/g, ''));
+        rows.push(cols);
+      }
+      return rows;
+    }
+
+    // SINAV CSV YÜKLEME VE İŞLEME ("Yeni Yüklenince Eskisi Silinsin" Kuralı)
+    function handleExamFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('examCsvTextarea').value = e.target.result;
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function processExamCsvUpload() {
+      const rawText = document.getElementById('examCsvTextarea').value;
+      if (!rawText.trim()) {
+        alert('Lütfen bir CSV dosyası seçin veya metin alanına sınav satırlarını yapıştırın.');
+        return;
+      }
+
+      const rows = parseCsvToRows(rawText);
+      if (rows.length === 0) {
+        alert('CSV içeriğinde geçerli satır bulunamadı.');
+        return;
+      }
+
+      const cleanOld = document.getElementById('chkCleanOldExams').checked;
+      const defaultTypeChoice = document.getElementById('csvExamDefaultType').value;
+
+      // Başlık satırı kontrolü
+      let startIndex = 0;
+      const firstRowStr = rows[0].join(' ').toLowerCase();
+      if (firstRowStr.includes('tarih') || firstRowStr.includes('ders') || firstRowStr.includes('tur')) {
+        startIndex = 1;
+      }
+
+      const parsedExams = [];
+
+      for (let i = startIndex; i < rows.length; i++) {
+        const cols = rows[i];
+        if (cols.length < 4) continue;
+
+        let examType = 'Vize';
+        let dateRaw = '';
+        let startRaw = '';
+        let endRaw = '';
+        let code = '';
+        let title = '';
+        let room = '[74 KMYO Amfi-4] Amfi-4';
+
+        // 7 kolonlu şablon: Tur;Tarih;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik
+        if (cols.length >= 7) {
+          examType = cols[0] || 'Vize';
+          dateRaw = cols[1];
+          startRaw = cols[2];
+          endRaw = cols[3];
+          code = cols[4];
+          title = cols[5];
+          room = cols[6] || room;
+        } 
+        // 6 kolonlu: Tarih;Baslangic;Bitis;Ders_Kodu;Ders_Adi;Derslik
+        else if (cols.length === 6) {
+          dateRaw = cols[0];
+          startRaw = cols[1];
+          endRaw = cols[2];
+          code = cols[3];
+          title = cols[4];
+          room = cols[5] || room;
+        }
+        // OBS tablosu formatı: Tarihi;Ders_Kodu;Ders_Adi;Derslik (Örn: 09.11.2026 09:00:00)
+        else if (cols.length >= 4) {
+          const dtParts = cols[0].split(' ');
+          dateRaw = dtParts[0];
+          startRaw = dtParts[1] ? dtParts[1].substring(0, 5) : '09:00';
+          code = cols[1];
+          title = cols[2];
+          room = cols[3];
+        }
+
+        if (defaultTypeChoice !== 'Otomatik') {
+          examType = defaultTypeChoice;
+        } else if (!examType || examType === 'Otomatik') {
+          examType = 'Vize';
+        }
+
+        // Tarih dönüştürme (09.11.2026 -> 2026-11-09)
+        let isoDate = dateRaw;
+        if (dateRaw.includes('.')) {
+          const [d, m, y] = dateRaw.split('.');
+          if (y && m && d) isoDate = `${y.trim()}-${m.trim().padStart(2, '0')}-${d.trim().padStart(2, '0')}`;
+        }
+
+        // Saat temizleme (09:00:00 -> 09:00)
+        if (startRaw.length > 5) startRaw = startRaw.substring(0, 5);
+        if (!endRaw || endRaw.length < 3) {
+          const [sh, sm] = startRaw.split(':').map(Number);
+          endRaw = `${String((sh + 1) % 24).padStart(2, '0')}:${String(sm).padStart(2, '0')}`;
+        } else if (endRaw.length > 5) {
+          endRaw = endRaw.substring(0, 5);
+        }
+
+        if (!title || !isoDate) continue;
+
+        parsedExams.push({
+          id: 'exam_' + Date.now() + '_' + i,
+          type: examType,
+          code: code || 'SINAV',
+          title: title,
+          date: isoDate,
+          startTime: startRaw,
+          endTime: endRaw,
+          location: room,
+          alertDismissed: false,
+          snoozeUntil: null,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      if (parsedExams.length === 0) {
+        alert('Hata: CSV verisinden geçerli sınav satırı okunamadı. Lütfen şablonu kontrol edin.');
+        return;
+      }
+
+      // "Yeni Program Yüklenince Eskisi Silinsin" Kuralı
+      if (cleanOld) {
+        // Eski sınavları yedekle
+        localStorage.setItem('kmyo_backup_exams', JSON.stringify(exams));
+        exams = parsedExams;
+      } else {
+        exams = exams.concat(parsedExams);
+      }
+
+      saveExams();
+      closeCsvModal();
+      switchMainView('exams');
+      alert(`Tebrikler! ${parsedExams.length} adet sınav başarıyla yüklendi ve eski sınav takvimi güncellendi.`);
+    }
+
+    function restoreBackupExams() {
+      const backupStr = localStorage.getItem('kmyo_backup_exams');
+      if (!backupStr) return;
+      if (confirm('Son silinen sınav takvimi geri yüklensin mi?')) {
+        exams = JSON.parse(backupStr);
+        localStorage.removeItem('kmyo_backup_exams');
+        saveExams();
+        alert('Sınav yedeği başarıyla geri yüklendi!');
+      }
+    }
+
+    // DERS PROGRAMI CSV YÜKLEME VE İŞLEME
+    function handleScheduleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('scheduleCsvTextarea').value = e.target.result;
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function processScheduleCsvUpload() {
+      const rawText = document.getElementById('scheduleCsvTextarea').value;
+      if (!rawText.trim()) {
+        alert('Lütfen bir CSV dosyası seçin veya metin alanına ders satırlarını yapıştırın.');
+        return;
+      }
+
+      const rows = parseCsvToRows(rawText);
+      if (rows.length === 0) {
+        alert('CSV içeriğinde geçerli satır bulunamadı.');
+        return;
+      }
+
+      let startIndex = 0;
+      const firstRowStr = rows[0].join(' ').toLowerCase();
+      if (firstRowStr.includes('gun') || firstRowStr.includes('ders') || firstRowStr.includes('saat')) {
+        startIndex = 1;
+      }
+
+      const newSchedule = { 1: { name: "Pazartesi", slots: [] }, 2: { name: "Salı", slots: [] }, 3: { name: "Çarşamba", slots: [] }, 4: { name: "Perşembe", slots: [] }, 5: { name: "Cuma", slots: [] } };
+      const dayMap = {
+        'pazartesi': 1, 'pzt': 1, '1': 1,
+        'salı': 2, 'sali': 2, 'sal': 2, '2': 2,
+        'çarşamba': 3, 'carsamba': 3, 'çar': 3, 'car': 3, '3': 3,
+        'perşembe': 4, 'persembe': 4, 'per': 4, '4': 4,
+        'cuma': 5, 'cum': 5, '5': 5
+      };
+
+      let count = 0;
+      for (let i = startIndex; i < rows.length; i++) {
+        const cols = rows[i];
+        if (cols.length < 5) continue;
+
+        const dayRaw = cols[0].toLowerCase().trim();
+        const dayIndex = dayMap[dayRaw];
+        if (!dayIndex) continue;
+
+        let sStart = cols[1].trim();
+        let sEnd = cols[2].trim();
+        const code = cols[3].trim();
+        const title = cols[4].trim();
+        const room = cols[5] ? cols[5].trim() : '74 KMYO Amfi-3';
+
+        if (sStart.length > 5) sStart = sStart.substring(0, 5);
+        if (sEnd.length > 5) sEnd = sEnd.substring(0, 5);
+
+        newSchedule[dayIndex].slots.push({
+          id: `DERS_DYN_${dayIndex}_${i}`,
+          start: sStart,
+          end: sEnd,
+          code: code,
+          title: title,
+          room: room,
+          roomClass: getRoomClass(room)
+        });
+        count++;
+      }
+
+      if (count === 0) {
+        alert('Hata: CSV verisinden geçerli ders saati okunamadı.');
+        return;
+      }
+
+      // Eski programı yedekle
+      localStorage.setItem('kmyo_backup_schedule', JSON.stringify(getActiveBaseSchedule()));
+
+      // Eski taşınan dersleri ve eski programı temizle
+      movedOverrides = {};
+      localStorage.removeItem('kmyo_moved_overrides');
+      
+      customScheduleData = newSchedule;
+      localStorage.setItem('kmyo_custom_schedule', JSON.stringify(customScheduleData));
+
+      updateChangesBanner();
+      renderSlots();
+      closeCsvModal();
+      switchMainView('schedule');
+      alert(`Harika! ${count} saatlik yeni haftalık ders programı yüklendi ve eski program temizlendi.`);
+    }
+
+    function restoreOfficialBaseSchedule() {
+      if (confirm('Resmi KMYO fabrika ders programına dönülsün mü?')) {
+        customScheduleData = null;
+        localStorage.removeItem('kmyo_custom_schedule');
+        movedOverrides = {};
+        localStorage.removeItem('kmyo_moved_overrides');
+        updateChangesBanner();
+        renderSlots();
+        closeCsvModal();
+        alert('Resmi ders programına sıfırlandı.');
+      }
+    }
+
+    function restoreBackupSchedule() {
+      const backupStr = localStorage.getItem('kmyo_backup_schedule');
+      if (!backupStr) return;
+      if (confirm('Son silinen ders programı geri yüklensin mi?')) {
+        customScheduleData = JSON.parse(backupStr);
+        localStorage.setItem('kmyo_custom_schedule', JSON.stringify(customScheduleData));
+        localStorage.removeItem('kmyo_backup_schedule');
+        renderSlots();
+        alert('Ders programı yedeği geri yüklendi!');
+      }
     }
 
     // ==================== TOPLANTI YÖNETİMİ MANTIĞI ====================
@@ -1632,9 +2264,8 @@
       checkBigAlerts(now);
     }
 
-    // Ders programındaki üst banner'lar (1-2 gün öncesi)
     function checkBanners(now) {
-      // 1. SINAV BANNERI KONTROLÜ
+      // 1. SINAV BANNERI
       const examBanner = document.getElementById('examReminderBanner');
       let upcomingExam = null;
       let minExamDiffMs = Infinity;
@@ -1644,8 +2275,6 @@
         const [y, mo, d] = e.date.split('-').map(Number);
         const [sh, sm] = e.startTime.split(':').map(Number);
         const startDt = new Date(y, mo - 1, d, sh, sm, 0);
-
-        // 2 gün öncesinin başlangıcı
         const twoDaysBefore = new Date(y, mo - 1, d - 2, 0, 0, 0);
 
         if (now >= twoDaysBefore && now <= startDt) {
@@ -1659,6 +2288,8 @@
 
       if (upcomingExam) {
         examBanner.classList.add('active');
+        const examType = upcomingExam.type || 'Vize';
+        document.getElementById('erbTag').innerText = `🚨 YAKLAŞAN ${examType.toUpperCase()} SINAVI HATIRLATMASI`;
         document.getElementById('erbTitle').innerText = `${upcomingExam.title} (${upcomingExam.code})`;
         document.getElementById('erbDate').innerText = '📅 ' + upcomingExam.date;
         document.getElementById('erbTime').innerText = `⏱ ${upcomingExam.startTime} - ${upcomingExam.endTime}`;
@@ -1671,7 +2302,7 @@
         examBanner.classList.remove('active');
       }
 
-      // 2. TOPLANTI BANNERI KONTROLÜ
+      // 2. TOPLANTI BANNERI
       const meetBanner = document.getElementById('meetingReminderBanner');
       let upcomingMeeting = null;
       let minMeetDiffMs = Infinity;
@@ -1703,9 +2334,8 @@
       }
     }
 
-    // 1 GÜN ÖNCE BÜYÜK EKRAN UYARISI (SINAV & TOPLANTI)
     function checkBigAlerts(now) {
-      // Önce Sınavları Kontrol Et (Sınavlar önceliklidir!)
+      // 1. Sınavları Kontrol Et
       for (const e of exams) {
         if (e.alertDismissed) continue;
         if (isItemExpired(e)) continue;
@@ -1715,7 +2345,6 @@
         const [sh, sm] = e.startTime.split(':').map(Number);
         const [eh, em] = e.endTime.split(':').map(Number);
 
-        // 1 gün önce saat 22:00 VEYA sınava 24 saatten az kaldığında
         const alertTriggerDt = new Date(y, mo - 1, d - 1, 22, 0, 0);
         const examStartDt = new Date(y, mo - 1, d, sh, sm, 0);
         const examEndDt = new Date(y, mo - 1, d, eh, em, 0);
@@ -1728,7 +2357,7 @@
         }
       }
 
-      // Sonra Toplantıları Kontrol Et
+      // 2. Toplantıları Kontrol Et
       for (const m of meetings) {
         if (m.alertDismissed) continue;
         if (isItemExpired(m)) continue;
@@ -1759,18 +2388,23 @@
       const codeRow = document.getElementById('bamCodeRow');
 
       if (type === 'exam') {
-        card.classList.add('exam-alert-border');
-        icon.classList.add('exam-icon-bg');
+        const examType = item.type || 'Vize';
+        card.style.borderColor = examType === 'Final' ? 'var(--final-color)' : (examType === 'Bütünleme' ? 'var(--but-color)' : 'var(--vize-color)');
+        icon.style.background = '#fef2f2';
+        icon.style.borderColor = '#fecaca';
+        icon.style.color = 'var(--vize-color)';
         icon.innerText = '📝';
-        tag.innerText = '🚨 ÖNEMLİ SINAV HATIRLATMASI';
+        tag.innerText = `🚨 ÖNEMLİ ${examType.toUpperCase()} SINAVI HATIRLATMASI`;
         tag.style.background = '#fee2e2';
         tag.style.color = '#dc2626';
         title.innerText = item.title;
         codeRow.style.display = 'flex';
         document.getElementById('bamCode').innerText = item.code;
       } else {
-        card.classList.remove('exam-alert-border');
-        icon.classList.remove('exam-icon-bg');
+        card.style.borderColor = 'var(--meeting-color)';
+        icon.style.background = '#eff6ff';
+        icon.style.borderColor = '#bfdbfe';
+        icon.style.color = 'var(--meeting-color)';
         icon.innerText = '📢';
         tag.innerText = '🏛️ ÖNEMLİ TOPLANTI HATIRLATMASI';
         tag.style.background = '#ede9fe';
@@ -1835,7 +2469,8 @@
     // ==================== DERS PROGRAMI LİSTELEME ====================
 
     function getComputedSlotsForDay(dayNum) {
-      const baseSlots = (baseScheduleData[dayNum]?.slots || []).map(s => ({ ...s, originalDay: dayNum }));
+      const activeSched = getActiveBaseSchedule();
+      const baseSlots = (activeSched[dayNum]?.slots || []).map(s => ({ ...s, originalDay: dayNum }));
       const conflictFilter = document.getElementById('conflictFilter')?.value || 'all';
       let result = [];
 
@@ -1859,7 +2494,7 @@
         if (parseInt(override.targetDay) === dayNum) {
           let origSlot = null;
           for (let d = 1; d <= 5; d++) {
-            const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
+            const found = activeSched[d]?.slots?.find(s => s.id === slotId);
             if (found) { origSlot = { ...found, originalDay: d }; break; }
           }
           if (origSlot) {
@@ -1883,8 +2518,7 @@
         }
       });
 
-      // 3. SINAVLARI DERS PROGRAMI LİSTESİNE EKLE (Günü geldiğinde veya 1 gün önceden)
-      const now = new Date();
+      // 3. SINAVLARI DERS PROGRAMINA EKLE
       exams.forEach(e => {
         if (isItemExpired(e)) return;
 
@@ -1894,20 +2528,22 @@
         if (eDayOfWeek === 0) eDayOfWeek = 7;
 
         if (eDayOfWeek === dayNum) {
+          const examType = e.type || 'Vize';
           result.push({
             id: e.id,
             start: e.startTime,
             end: e.endTime,
             code: e.code,
-            title: '📝 SINAV: ' + e.title,
+            title: `📝 [${examType.toUpperCase()}] ${e.title}`,
             room: e.location,
-            roomClass: 'room-exam',
-            isExamItem: true
+            roomClass: getRoomClass(e.location, examType),
+            isExamItem: true,
+            examType: examType
           });
         }
       });
 
-      // 4. TOPLANTILARI DERS PROGRAMI LİSTESİNE EKLE
+      // 4. TOPLANTILARI DERS PROGRAMINA EKLE
       meetings.forEach(m => {
         if (isItemExpired(m)) return;
 
@@ -1930,7 +2566,6 @@
         }
       });
 
-      // Filtreleme
       if (conflictFilter === 'onlyMoved') {
         result = result.filter(s => s.isRelocatedTarget || s.isMovedSource);
       } else if (conflictFilter === 'onlyOriginal') {
@@ -1972,7 +2607,11 @@
         let cardClasses = ['slot-card'];
         if (isNow) cardClasses.push('current-active');
         if (slot.isMovedSource) cardClasses.push('moved-source');
-        if (slot.isExamItem) cardClasses.push('exam-slot-card');
+        if (slot.isExamItem) {
+          cardClasses.push('exam-slot-card');
+          if (slot.examType === 'Final') cardClasses.push('final-exam-card');
+          else if (slot.examType === 'Bütünleme') cardClasses.push('but-exam-card');
+        }
         if (slot.isMeetingItem) cardClasses.push('meeting-slot-card');
 
         card.className = cardClasses.join(' ');
@@ -1985,14 +2624,14 @@
         } else if (slot.isRelocatedTarget) {
           statusBadgeHtml = `<div class="relocated-target-badge">🔄 ${dayNames[slot.fromDay]} ${slot.origStart}'den buraya taşındı</div>`;
         } else if (slot.isExamItem) {
-          statusBadgeHtml = `<span style="background:var(--exam-color); color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ SINAV</span>`;
+          statusBadgeHtml = `<span style="background:var(--vize-color); color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">${slot.examType ? slot.examType.toUpperCase() : 'RESMİ'} SINAV</span>`;
         } else if (slot.isMeetingItem) {
           statusBadgeHtml = `<span style="background:var(--meeting-color); color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ TOPLANTI</span>`;
         }
 
         let actionBtnHtml = '';
         if (slot.isExamItem) {
-          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--exam-color);">Sınavlar sekmesinde kayıtlı</span>`;
+          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--vize-color);">Sınavlar sekmesinde kayıtlı</span>`;
         } else if (slot.isMeetingItem) {
           actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--meeting-color);">Toplantılar sekmesinde kayıtlı</span>`;
         } else if (slot.isMovedSource || slot.isRelocatedTarget) {
@@ -2021,11 +2660,12 @@
       });
     }
 
-    // Modal İşlemleri
+    // Modal İşlemleri (Ders Taşıma)
     function openMoveModal(slotId) {
+      const activeSched = getActiveBaseSchedule();
       let slot = null;
       for (let d = 1; d <= 5; d++) {
-        const found = baseScheduleData[d]?.slots?.find(s => s.id === slotId);
+        const found = activeSched[d]?.slots?.find(s => s.id === slotId);
         if (found) { slot = { ...found, day: d }; break; }
       }
       if (!slot) return;
@@ -2044,7 +2684,8 @@
       const targetSlot = document.getElementById('targetSlotSelect').value;
       const [tsStart] = targetSlot.split('-');
 
-      const targetDaySlots = baseScheduleData[targetDay]?.slots || [];
+      const activeSched = getActiveBaseSchedule();
+      const targetDaySlots = activeSched[targetDay]?.slots || [];
       const existingSlot = targetDaySlots.find(s => s.start === tsStart);
 
       const roomSelect = document.getElementById('targetRoomSelect');
@@ -2175,15 +2816,15 @@
 
       if (currentSlot) {
         let tagText = "CANLI • DERS DEVAM EDİYOR";
-        if (slot.isExamItem) tagText = "CANLI • SINAV DEVAM EDİYOR";
-        else if (slot.isMeetingItem) tagText = "CANLI • TOPLANTI DEVAM EDİYOR";
+        if (currentSlot.isExamItem) tagText = `CANLI • ${currentSlot.examType ? currentSlot.examType.toUpperCase() : ''} SINAVI DEVAM EDİYOR`;
+        else if (currentSlot.isMeetingItem) tagText = "CANLI • TOPLANTI DEVAM EDİYOR";
 
         liveTagTitle.innerText = tagText;
         liveStatusText.innerText = `${currentSlot.title} (${currentSlot.room})`;
         liveSubText.innerText = `Bitişe ${currentSlot.remainMin} dakika kaldı.`;
       } else if (nextSlot) {
         let tagText = "SIRADAKİ DERS";
-        if (nextSlot.isExamItem) tagText = "SIRADAKİ SINAV";
+        if (nextSlot.isExamItem) tagText = `SIRADAKİ ${nextSlot.examType ? nextSlot.examType.toUpperCase() : ''} SINAVI`;
         else if (nextSlot.isMeetingItem) tagText = "SIRADAKİ TOPLANTI";
 
         liveTagTitle.innerText = tagText;
@@ -2240,18 +2881,19 @@
         const cleanDate = e.date.replace(/-/g, '');
         const sHour = e.startTime.replace(':', '') + "00";
         const eHour = e.endTime.replace(':', '') + "00";
+        const examType = e.type || 'Vize';
         icsContent.push(
           "BEGIN:VEVENT",
           `UID:kmyo-exam-${idx}@mku.edu.tr`,
-          `SUMMARY:📝 SINAV: ${e.title} (${e.location})`,
+          `SUMMARY:📝 ${examType.toUpperCase()} SINAVI: ${e.title} (${e.location})`,
           `LOCATION:${e.location}`,
-          `DESCRIPTION:Ders Kodu: ${e.code}\\nSınav Salonu: ${e.location}\\nÖğr. Gör. Fatih Akman ÇAKMAK`,
+          `DESCRIPTION:Sınav Türü: ${examType}\\nDers Kodu: ${e.code}\\nSınav Salonu: ${e.location}\\nÖğr. Gör. Fatih Akman ÇAKMAK`,
           `DTSTART:${cleanDate}T${sHour}`,
           `DTEND:${cleanDate}T${eHour}`,
           "BEGIN:VALARM",
           "TRIGGER:-PT15M",
           "ACTION:DISPLAY",
-          "DESCRIPTION:15 dakika sonra sınav başlayacak!",
+          "DESCRIPTION:15 dakika sonra ${examType} sınavı başlayacak!",
           "END:VALARM",
           "END:VEVENT"
         );
