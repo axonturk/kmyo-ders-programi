@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e3a8a">
-  <title>KMYO Ders, Danışmanlık ve Toplantı Programı - Öğr. Gör. Fatih Akman ÇAKMAK</title>
+  <title>KMYO Ders, Sınav ve Toplantı Programı - Öğr. Gör. Fatih Akman ÇAKMAK</title>
   <style>
     :root {
       --primary: #1d4ed8;
@@ -26,6 +26,8 @@
       --amfi3: #0284c7;
       --amfi4: #d97706;
       --ofis: #059669;
+      --exam-color: #dc2626;
+      --exam-bg: #fef2f2;
       --meeting-color: #8b5cf6;
       --meeting-bg: #f5f3ff;
       --warning: #f59e0b;
@@ -44,6 +46,7 @@
         --border: #334155;
         --live-bg: #064e3b;
         --warning-bg: #451a03;
+        --exam-bg: #450a0a;
         --meeting-bg: #2e1065;
         --shadow: 0 4px 14px rgba(0,0,0,0.3);
       }
@@ -76,19 +79,23 @@
       backdrop-filter: blur(8px);
     }
 
-    /* Ana Mod Sekmeleri (Ders Programı / Toplantılar) */
+    /* Ana Mod Sekmeleri: [Ders Programı] | [Sınavlar (N)] | [Toplantılar (N)] */
     .main-nav-tabs {
       display: flex;
       background: var(--card-bg);
       border-bottom: 1px solid var(--border);
-      padding: 6px 16px 0;
-      gap: 12px;
+      padding: 4px 12px 0;
+      gap: 6px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .main-nav-tabs::-webkit-scrollbar { display: none; }
     .main-tab-btn {
       flex: 1;
-      padding: 12px 6px;
-      font-size: 14px;
+      min-width: 105px;
+      padding: 12px 4px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-muted);
       background: none;
@@ -98,8 +105,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .main-tab-btn.active {
       color: var(--primary);
@@ -111,10 +119,15 @@
       font-size: 11px;
       padding: 2px 7px;
       border-radius: 10px;
+      font-weight: 800;
     }
-    .tab-counter.alert-counter {
+    .tab-counter.exam-counter {
       background: #fee2e2;
-      color: #b91c1c;
+      color: #dc2626;
+    }
+    .tab-counter.meeting-counter {
+      background: #ede9fe;
+      color: #7c3aed;
     }
 
     /* PWA Yükleme Banner'ı */
@@ -140,7 +153,42 @@
       cursor: pointer;
     }
 
-    /* Yaklaşan Toplantı Banner'ı (Ders programında 2 gün önceden görünen) */
+    /* Yaklaşan Sınav Banner'ı (Ders programında görünen) */
+    .exam-reminder-banner {
+      display: none;
+      margin: 12px 16px 4px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.3);
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      animation: pulseBorder 2s infinite ease-in-out;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 6px 18px rgba(220, 38, 38, 0.3); }
+      50% { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.55); }
+    }
+    .exam-reminder-banner.active { display: flex; }
+    .erb-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.22);
+      padding: 3px 8px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .erb-title { font-size: 16px; font-weight: 800; }
+    .erb-details { font-size: 13px; opacity: 0.95; display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Yaklaşan Toplantı Banner'ı */
     .meeting-reminder-banner {
       display: none;
       margin: 12px 16px 4px;
@@ -303,7 +351,14 @@
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
     }
 
-    /* TOPLANTI KARTI STİLİ (Ders programı içine düştüğünde) */
+    /* SINAV KARTI STİLİ */
+    .slot-card.exam-slot-card {
+      border: 2px solid var(--exam-color);
+      background: var(--exam-bg);
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.18);
+    }
+
+    /* TOPLANTI KARTI STİLİ */
     .slot-card.meeting-slot-card {
       border: 2px solid var(--meeting-color);
       background: var(--meeting-bg);
@@ -372,6 +427,7 @@
     .room-amfi4 { background-color: var(--amfi4); }
     .room-ofis { background-color: var(--ofis); }
     .room-meeting { background-color: var(--meeting-color); }
+    .room-exam { background-color: var(--exam-color); }
 
     .course-title {
       font-size: 16px;
@@ -418,16 +474,16 @@
       cursor: pointer;
     }
 
-    /* TOPLANTILAR SEKMESİ ARAYÜZÜ */
-    .meetings-view {
+    /* ==================== SINAVLAR VE TOPLANTILAR GÖRÜNÜMÜ ==================== */
+    .section-view {
       display: none;
       padding: 16px;
       flex-direction: column;
       gap: 16px;
     }
-    .meetings-view.active { display: flex; }
+    .section-view.active { display: flex; }
 
-    .meeting-form-card {
+    .custom-form-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 18px;
@@ -437,7 +493,7 @@
       flex-direction: column;
       gap: 12px;
     }
-    .mfc-title {
+    .cfc-title {
       font-size: 16px;
       font-weight: 800;
       color: var(--text);
@@ -445,10 +501,7 @@
       align-items: center;
       gap: 8px;
     }
-    .form-row {
-      display: flex;
-      gap: 10px;
-    }
+    .form-row { display: flex; gap: 10px; }
     .form-group {
       flex: 1;
       display: flex;
@@ -470,7 +523,7 @@
       font-weight: 600;
       outline: none;
     }
-    .btn-add-meeting {
+    .btn-submit-action {
       background: var(--primary);
       color: white;
       border: none;
@@ -485,8 +538,11 @@
       gap: 8px;
       margin-top: 4px;
     }
+    .btn-submit-exam {
+      background: var(--exam-color);
+    }
 
-    .meeting-item-card {
+    .item-card {
       background: var(--card-bg);
       border-radius: 16px;
       border: 1px solid var(--border);
@@ -497,33 +553,40 @@
       gap: 8px;
       position: relative;
     }
-    .meeting-item-card.past-meeting {
+    .item-card.exam-item {
+      border-left: 4px solid var(--exam-color);
+    }
+    .item-card.meeting-item {
+      border-left: 4px solid var(--meeting-color);
+    }
+    .item-card.past-item {
       opacity: 0.6;
       background: rgba(0,0,0,0.02);
     }
-    .mic-header {
+    .ic-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .mic-time {
+    .ic-time {
       font-size: 13px;
       font-weight: 800;
       color: var(--primary);
     }
-    .mic-title {
+    .ic-title {
       font-size: 16px;
       font-weight: 800;
       color: var(--text);
     }
-    .mic-loc {
+    .ic-sub {
       font-size: 12px;
       color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 5px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
     }
-    .btn-delete-meeting {
+    .btn-delete-item {
       background: #fee2e2;
       color: #b91c1c;
       border: 1px solid rgba(185, 28, 28, 0.2);
@@ -651,12 +714,12 @@
       cursor: pointer;
     }
 
-    /* BÜYÜK TOPLANTI UYARI MODALI (1 GÜN ÖNCE 22:00'DE ÇIKAN) */
+    /* ==================== BÜYÜK UYARI MODALI (SINAV VE TOPLANTI İÇİN) ==================== */
     .big-alert-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       z-index: 9999;
       backdrop-filter: blur(8px);
       align-items: center;
@@ -678,6 +741,9 @@
       text-align: center;
       animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .big-alert-card.exam-alert-border {
+      border-color: var(--exam-color);
+    }
     @keyframes popIn {
       from { transform: scale(0.8); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -696,6 +762,11 @@
       border: 3px solid #bfdbfe;
       animation: bounce 2s infinite;
     }
+    .big-alert-icon.exam-icon-bg {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: var(--exam-color);
+    }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
     .big-alert-tag {
       font-size: 12px;
@@ -708,7 +779,7 @@
       margin: 0 auto;
       letter-spacing: 0.5px;
     }
-    .big-alert-meeting-title {
+    .big-alert-title {
       font-size: 21px;
       font-weight: 800;
       color: var(--text);
@@ -772,13 +843,16 @@
     </div>
   </div>
 
-  <!-- Ana Mod Sekmeleri: [Ders Programı] | [Toplantılar (N)] -->
+  <!-- Ana Mod Sekmeleri: [Ders Programı] | [Sınavlar (N)] | [Toplantılar (N)] -->
   <div class="main-nav-tabs">
     <button class="main-tab-btn active" id="tabNavSchedule" onclick="switchMainView('schedule')">
       📚 Haftalık Program
     </button>
+    <button class="main-tab-btn" id="tabNavExams" onclick="switchMainView('exams')">
+      📝 Sınavlar <span class="tab-counter exam-counter" id="examBadgeCnt">7</span>
+    </button>
     <button class="main-tab-btn" id="tabNavMeetings" onclick="switchMainView('meetings')">
-      🏛️ Toplantılar <span class="tab-counter" id="meetingBadgeCnt">0</span>
+      🏛️ Toplantılar <span class="tab-counter meeting-counter" id="meetingBadgeCnt">0</span>
     </button>
   </div>
 
@@ -791,7 +865,19 @@
     <button onclick="installPWA()">YÜKLE</button>
   </div>
 
-  <!-- Yaklaşan Toplantı Bildirim Çubuğu (Ders programında 2 gün önceden görünen) -->
+  <!-- Yaklaşan Sınav Bildirim Çubuğu (Ders programında 1-2 gün önceden görünen) -->
+  <div class="exam-reminder-banner" id="examReminderBanner">
+    <div class="erb-tag">🚨 YAKLAŞAN SINAV HATIRLATMASI</div>
+    <div class="erb-title" id="erbTitle">Web Güvenliği Sınavı</div>
+    <div class="erb-details">
+      <span id="erbDate">📅 09.11.2026</span>
+      <span id="erbTime">⏱ 09:00</span>
+      <span id="erbLoc">📍 74 KMYO Amfi-4</span>
+      <span id="erbCountdown" style="font-weight:800; text-decoration:underline;">⏳ Kalan süre</span>
+    </div>
+  </div>
+
+  <!-- Yaklaşan Toplantı Bildirim Çubuğu -->
   <div class="meeting-reminder-banner" id="meetingReminderBanner">
     <div class="mrb-tag">⏰ YAKLAŞAN TOPLANTI HATIRLATMASI</div>
     <div class="mrb-title" id="mrbTitle">Toplantı Başlığı</div>
@@ -828,7 +914,7 @@
 
     <!-- Görünüm Seçenekleri -->
     <div class="view-toggle-bar">
-      <span id="daySummaryText">Ders Akışı</span>
+      <span id="daySummaryText">Ders ve Sınav Akışı</span>
       <label style="display:flex; align-items:center; gap:6px;">
         Görünüm:
         <select class="view-select" id="conflictFilter" onchange="renderSlots()">
@@ -849,11 +935,70 @@
     </div>
   </div>
 
-  <!-- ==================== GÖRÜNÜM 2: TOPLANTILAR SEKMESİ ==================== -->
-  <div class="meetings-view" id="viewMeetings">
+  <!-- ==================== GÖRÜNÜM 2: SINAVLAR SEKMESİ ==================== -->
+  <div class="section-view" id="viewExams">
+    <!-- Sınav Ekleme Formu -->
+    <div class="custom-form-card">
+      <div class="cfc-title" style="color:var(--exam-color);">📝 Yeni Sınav Ekle</div>
+      
+      <div class="form-row">
+        <div class="form-group" style="flex:2;">
+          <label class="form-label">Ders Adı *</label>
+          <input type="text" class="form-input" id="inpExamTitle" placeholder="Örn: Web Güvenliği">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">Ders Kodu</label>
+          <input type="text" class="form-input" id="inpExamCode" placeholder="74322301">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Sınav Tarihi *</label>
+          <input type="date" class="form-input" id="inpExamDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Derslik / Amfi *</label>
+          <select class="form-select" id="inpExamLocation">
+            <option value="74 KMYO Amfi-4">[74 KMYO Amfi-4] Amfi-4</option>
+            <option value="74 KMYO Amfi-3">[74 KMYO Amfi-3] Amfi-3</option>
+            <option value="74 KMYO Amfi-2">[74 KMYO Amfi-2] Amfi-2</option>
+            <option value="74 KMYO Amfi-1">[74 KMYO Amfi-1] Amfi-1</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Başlangıç Saati *</label>
+          <input type="time" class="form-input" id="inpExamStart" value="09:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bitiş Saati *</label>
+          <input type="time" class="form-input" id="inpExamEnd" value="10:00">
+        </div>
+      </div>
+
+      <button class="btn-submit-action btn-submit-exam" onclick="saveNewExam()">💾 Sınavı Kaydet</button>
+    </div>
+
+    <!-- Aktif / Kayıtlı Sınavlar Listesi -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+      <div style="font-size:15px; font-weight:800; color:var(--text);">
+        📋 Tanımlı Sınav Takvimi
+      </div>
+      <button onclick="restoreDefaultExams()" style="background:none; border:none; font-size:11px; color:var(--primary); font-weight:700; cursor:pointer;">
+        🔄 Resmi Programı Yenile
+      </button>
+    </div>
+    <div id="examsListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
+  <!-- ==================== GÖRÜNÜM 3: TOPLANTILAR SEKMESİ ==================== -->
+  <div class="section-view" id="viewMeetings">
     <!-- Toplantı Ekleme Formu -->
-    <div class="meeting-form-card">
-      <div class="mfc-title">➕ Yeni Toplantı Ekle</div>
+    <div class="custom-form-card">
+      <div class="cfc-title" style="color:var(--meeting-color);">🏛️ Yeni Toplantı Ekle</div>
       
       <div class="form-group">
         <label class="form-label">Toplantı Konusu / Başlığı *</label>
@@ -882,7 +1027,7 @@
         </div>
       </div>
 
-      <button class="btn-add-meeting" onclick="saveNewMeeting()">💾 Toplantıyı Kaydet</button>
+      <button class="btn-submit-action" style="background:var(--meeting-color);" onclick="saveNewMeeting()">💾 Toplantıyı Kaydet</button>
     </div>
 
     <!-- Aktif / Yaklaşan Toplantılar -->
@@ -966,12 +1111,12 @@
     </div>
   </div>
 
-  <!-- ==================== BÜYÜK TOPLANTI UYARI PENCERESİ (1 GÜN ÖNCE 22:00) ==================== -->
-  <div class="big-alert-overlay" id="bigMeetingAlertModal">
-    <div class="big-alert-card">
-      <div class="big-alert-icon">📢</div>
-      <div class="big-alert-tag">🚨 ÖNEMLİ TOPLANTI HATIRLATMASI</div>
-      <div class="big-alert-meeting-title" id="bamTitle">Toplantı Başlığı</div>
+  <!-- ==================== BÜYÜK UYARI PENCERESİ (1 GÜN ÖNCE 22:00) ==================== -->
+  <div class="big-alert-overlay" id="universalBigAlertModal">
+    <div class="big-alert-card" id="universalBigAlertCard">
+      <div class="big-alert-icon" id="bamIcon">📝</div>
+      <div class="big-alert-tag" id="bamTag">🚨 ÖNEMLİ SINAV HATIRLATMASI</div>
+      <div class="big-alert-title" id="bamTitle">Web Güvenliği Sınavı</div>
       
       <div class="big-alert-details-box">
         <div class="bad-row">
@@ -983,8 +1128,12 @@
           <span class="bad-val" id="bamTime">-</span>
         </div>
         <div class="bad-row">
-          <span class="bad-label">📍 Yer:</span>
+          <span class="bad-label">📍 Derslik / Yer:</span>
           <span class="bad-val" id="bamLoc">-</span>
+        </div>
+        <div class="bad-row" id="bamCodeRow">
+          <span class="bad-label">🏷️ Ders Kodu:</span>
+          <span class="bad-val" id="bamCode">-</span>
         </div>
         <div class="bad-row" style="margin-top:4px; padding-top:6px; border-top:1px dashed var(--border);">
           <span class="bad-label">⏳ Durum:</span>
@@ -1106,15 +1255,105 @@
       if (roomName.includes('Amfi-4')) return 'room-amfi4';
       if (roomName.includes('Ofis')) return 'room-ofis';
       if (roomName.includes('Toplantı') || roomName.includes('Müdür')) return 'room-meeting';
+      if (roomName.includes('Sınav') || roomName.includes('Vize')) return 'room-exam';
       return 'room-amfi3';
     }
+
+    // Kullanıcının Gönderdiği Resmi Sınav Programı (09.11.2026 - 13.11.2026)
+    const officialDefaultExams = [
+      {
+        id: "exam_1",
+        code: "74322301",
+        title: "Web Güvenliği",
+        date: "2026-11-09",
+        startTime: "09:00",
+        endTime: "10:00",
+        location: "[74 KMYO Amfi-4] Amfi-4",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_2",
+        code: "74112335",
+        title: "Yönlendiriciler I",
+        date: "2026-11-09",
+        startTime: "14:00",
+        endTime: "15:00",
+        location: "[74 KMYO Amfi-4] Amfi-4",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_3",
+        code: "74192323",
+        title: "İleri Ağ Yönetimi",
+        date: "2026-11-11",
+        startTime: "10:30",
+        endTime: "11:30",
+        location: "[74 KMYO Amfi-4] Amfi-4",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_4",
+        code: "74191113",
+        title: "Ağ Teknolojilerine Giriş",
+        date: "2026-11-11",
+        startTime: "14:00",
+        endTime: "15:00",
+        location: "[74 KMYO Amfi-3] Amfi-3",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_5",
+        code: "74112309",
+        title: "Bilgi ve Ağ Güvenliği",
+        date: "2026-11-12",
+        startTime: "09:00",
+        endTime: "10:00",
+        location: "[74 KMYO Amfi-3] Amfi-3",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_6",
+        code: "74112317",
+        title: "Kablolama",
+        date: "2026-11-12",
+        startTime: "11:00",
+        endTime: "12:00",
+        location: "[74 KMYO Amfi-3] Amfi-3",
+        alertDismissed: false,
+        snoozeUntil: null
+      },
+      {
+        id: "exam_7",
+        code: "74192329",
+        title: "Güvenlik Duvarı Çözümleri",
+        date: "2026-11-13",
+        startTime: "09:00",
+        endTime: "10:00",
+        location: "[74 KMYO Amfi-3] Amfi-3",
+        alertDismissed: false,
+        snoozeUntil: null
+      }
+    ];
 
     // 4. Veri Yönetimi (LocalStorage)
     let movedOverrides = JSON.parse(localStorage.getItem('kmyo_moved_overrides') || '{}');
     let meetings = JSON.parse(localStorage.getItem('kmyo_meetings') || '[]');
+    let exams = JSON.parse(localStorage.getItem('kmyo_exams') || 'null');
+    
+    // Sınavlar LocalStorage'da yoksa varsayılan resmi sınavları ata
+    if (!exams || !Array.isArray(exams) || exams.length === 0) {
+      exams = JSON.parse(JSON.stringify(officialDefaultExams));
+      localStorage.setItem('kmyo_exams', JSON.stringify(exams));
+    }
+
     let activeDay = 1;
     let selectedSlotToMove = null;
-    let currentActiveBigAlertMeeting = null;
+    let currentActiveBigAlert = null; // { type: 'exam' | 'meeting', data: obj }
 
     function saveOverrides() {
       localStorage.setItem('kmyo_moved_overrides', JSON.stringify(movedOverrides));
@@ -1124,51 +1363,182 @@
 
     function saveMeetings() {
       localStorage.setItem('kmyo_meetings', JSON.stringify(meetings));
-      updateMeetingsBadge();
+      updateBadges();
       renderMeetingsList();
-      checkMeetingVisibilityInSchedule();
-      checkBigMeetingAlert();
+      checkAllReminders();
     }
 
-    function updateMeetingsBadge() {
-      const activeCount = meetings.filter(m => !isMeetingExpired(m)).length;
-      const badge = document.getElementById('meetingBadgeCnt');
-      if (badge) {
-        badge.innerText = activeCount;
-        badge.classList.toggle('alert-counter', activeCount > 0);
+    function saveExams() {
+      localStorage.setItem('kmyo_exams', JSON.stringify(exams));
+      updateBadges();
+      renderExamsList();
+      checkAllReminders();
+    }
+
+    function restoreDefaultExams() {
+      if (confirm('Kayıtlı sınavlar resmi MKÜ KMYO sınav takvimine sıfırlansın mı?')) {
+        exams = JSON.parse(JSON.stringify(officialDefaultExams));
+        saveExams();
       }
+    }
+
+    function updateBadges() {
+      const activeMeetings = meetings.filter(m => !isItemExpired(m)).length;
+      const activeExams = exams.filter(e => !isItemExpired(e)).length;
+
+      const mBadge = document.getElementById('meetingBadgeCnt');
+      if (mBadge) mBadge.innerText = activeMeetings;
+
+      const eBadge = document.getElementById('examBadgeCnt');
+      if (eBadge) eBadge.innerText = activeExams;
     }
 
     function switchMainView(viewName) {
       const scheduleView = document.getElementById('viewSchedule');
+      const examsView = document.getElementById('viewExams');
       const meetingsView = document.getElementById('viewMeetings');
+      
       const tabSched = document.getElementById('tabNavSchedule');
+      const tabExam = document.getElementById('tabNavExams');
       const tabMeet = document.getElementById('tabNavMeetings');
 
-      if (viewName === 'meetings') {
-        scheduleView.style.display = 'none';
+      // Gizle
+      scheduleView.style.display = 'none';
+      examsView.classList.remove('active');
+      meetingsView.classList.remove('active');
+      tabSched.classList.remove('active');
+      tabExam.classList.remove('active');
+      tabMeet.classList.remove('active');
+
+      if (viewName === 'exams') {
+        examsView.classList.add('active');
+        tabExam.classList.add('active');
+        renderExamsList();
+      } else if (viewName === 'meetings') {
         meetingsView.classList.add('active');
-        tabSched.classList.remove('active');
         tabMeet.classList.add('active');
         renderMeetingsList();
       } else {
-        meetingsView.classList.remove('active');
         scheduleView.style.display = 'block';
-        tabMeet.classList.remove('active');
         tabSched.classList.add('active');
         renderSlots();
       }
     }
 
-    // ==================== TOPLANTI YÖNETİMİ MANTIĞI ====================
-
-    function isMeetingExpired(meeting) {
+    function isItemExpired(item) {
       const now = new Date();
-      const [y, m, d] = meeting.date.split('-').map(Number);
-      const [eh, em] = meeting.endTime.split(':').map(Number);
+      const [y, m, d] = item.date.split('-').map(Number);
+      const [eh, em] = item.endTime.split(':').map(Number);
       const endDt = new Date(y, m - 1, d, eh, em, 0);
       return now > endDt;
     }
+
+    // ==================== SINAV YÖNETİMİ MANTIĞI ====================
+
+    function saveNewExam() {
+      const title = document.getElementById('inpExamTitle').value.trim();
+      const code = document.getElementById('inpExamCode').value.trim() || 'SINAV';
+      const date = document.getElementById('inpExamDate').value;
+      const startTime = document.getElementById('inpExamStart').value;
+      const endTime = document.getElementById('inpExamEnd').value;
+      const location = document.getElementById('inpExamLocation').value;
+
+      if (!title || !date || !startTime || !endTime) {
+        alert('Lütfen ders adı, sınav tarihi, başlangıç ve bitiş saatlerini eksiksiz girin.');
+        return;
+      }
+
+      const newExam = {
+        id: 'exam_' + Date.now(),
+        code: code,
+        title: title,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        location: location,
+        alertDismissed: false,
+        snoozeUntil: null,
+        createdAt: new Date().toISOString()
+      };
+
+      exams.push(newExam);
+      saveExams();
+
+      document.getElementById('inpExamTitle').value = '';
+      document.getElementById('inpExamCode').value = '';
+
+      alert('Sınav takvime başarıyla eklendi! 1 gün önceden büyük ekran uyarısı ve ders programı hatırlatması devreye girecek.');
+    }
+
+    function deleteExam(id) {
+      if (confirm('Bu sınav kaydını silmek istediğinize emin misiniz?')) {
+        exams = exams.filter(e => e.id !== id);
+        saveExams();
+      }
+    }
+
+    function renderExamsList() {
+      const container = document.getElementById('examsListContainer');
+      container.innerHTML = '';
+
+      if (exams.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding:30px;">
+            <h3>Henüz Kayıtlı Sınav Yok</h3>
+            <p>Yukarıdaki formu kullanarak yeni sınav ekleyebilir veya "Resmi Programı Yenile"ye basabilirsiniz.</p>
+          </div>
+        `;
+        return;
+      }
+
+      exams.sort((a, b) => (a.date + ' ' + a.startTime).localeCompare(b.date + ' ' + b.startTime));
+
+      const now = new Date();
+
+      exams.forEach(e => {
+        const expired = isItemExpired(e);
+        const card = document.createElement('div');
+        card.className = 'item-card exam-item' + (expired ? ' past-item' : '');
+
+        const [y, mo, d] = e.date.split('-');
+        const dateStr = `${d}.${mo}.${y}`;
+
+        // Kalan gün hesabı
+        const [sh, sm] = e.startTime.split(':').map(Number);
+        const startDt = new Date(Number(y), Number(mo) - 1, Number(d), sh, sm, 0);
+        const diffMs = startDt - now;
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+        let countdownPill = '';
+        if (expired) {
+          countdownPill = '<span style="color:#64748b; font-size:11px; font-weight:700;">✓ Tamamlandı</span>';
+        } else if (diffDays === 0) {
+          countdownPill = '<span style="color:#dc2626; font-size:11px; font-weight:800; background:#fee2e2; padding:2px 8px; border-radius:6px;">🔴 BUGÜN</span>';
+        } else if (diffDays === 1) {
+          countdownPill = '<span style="color:#ea580c; font-size:11px; font-weight:800; background:#ffedd5; padding:2px 8px; border-radius:6px;">⏰ YARIN</span>';
+        } else {
+          countdownPill = `<span style="color:#2563eb; font-size:11px; font-weight:800; background:#eff6ff; padding:2px 8px; border-radius:6px;">⏳ ${diffDays} gün kaldı</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="ic-header">
+            <span class="ic-time" style="color:var(--exam-color);">⏱ ${e.startTime} - ${e.endTime}</span>
+            <div>${countdownPill}</div>
+          </div>
+          <div class="ic-title">📝 ${e.title}</div>
+          <div class="ic-sub">🏷️ Kod: <b>${e.code}</b> &nbsp;|&nbsp; 📍 Yer: <b>${e.location}</b></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--border); padding-top:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">
+              📅 <b>${dateStr}</b> &nbsp;•&nbsp; ${e.alertDismissed ? '🔕 Uyarı Kapatıldı' : (e.snoozeUntil ? '⏰ Ertelendi' : '🔔 1 Gün Önce Alarmı')}
+            </span>
+            <button class="btn-delete-item" onclick="deleteExam('${e.id}')">🗑️ Sil</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ==================== TOPLANTI YÖNETİMİ MANTIĞI ====================
 
     function saveNewMeeting() {
       const title = document.getElementById('inpMeetingTitle').value.trim();
@@ -1197,11 +1567,10 @@
       meetings.push(newMeeting);
       saveMeetings();
 
-      // Formu temizle
       document.getElementById('inpMeetingTitle').value = '';
       document.getElementById('inpMeetingLocation').value = '';
 
-      alert('Toplantı başarıyla kaydedildi! 2 gün önceden ders programında görünmeye başlayacak.');
+      alert('Toplantı başarıyla kaydedildi!');
     }
 
     function deleteMeeting(id) {
@@ -1225,118 +1594,196 @@
         return;
       }
 
-      // Tarihe göre sırala
       meetings.sort((a, b) => (a.date + ' ' + a.startTime).localeCompare(b.date + ' ' + b.startTime));
 
       meetings.forEach(m => {
-        const expired = isMeetingExpired(m);
+        const expired = isItemExpired(m);
         const card = document.createElement('div');
-        card.className = 'meeting-item-card' + (expired ? ' past-meeting' : '');
+        card.className = 'item-card meeting-item' + (expired ? ' past-item' : '');
 
         const [y, mo, d] = m.date.split('-');
         const dateStr = `${d}.${mo}.${y}`;
 
         card.innerHTML = `
-          <div class="mic-header">
-            <span class="mic-time">⏱ ${m.startTime} - ${m.endTime}</span>
+          <div class="ic-header">
+            <span class="ic-time" style="color:var(--meeting-color);">⏱ ${m.startTime} - ${m.endTime}</span>
             <span style="font-size:12px; font-weight:700; color:${expired ? 'var(--text-muted)' : 'var(--primary)'}">
               ${dateStr} ${expired ? '(Tamamlandı)' : '• Aktif'}
             </span>
           </div>
-          <div class="mic-title">🏛️ ${m.title}</div>
-          <div class="mic-loc">📍 Yer: <b>${m.location}</b></div>
+          <div class="ic-title">🏛️ ${m.title}</div>
+          <div class="ic-sub">📍 Yer: <b>${m.location}</b></div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--border); padding-top:8px;">
             <span style="font-size:11px; color:var(--text-muted);">
               ${m.alertDismissed ? '🔕 Uyarı Kapatıldı' : (m.snoozeUntil ? '⏰ Ertelendi' : '🔔 22:00 Alarmı Aktif')}
             </span>
-            <button class="btn-delete-meeting" onclick="deleteMeeting('${m.id}')">🗑️ Sil</button>
+            <button class="btn-delete-item" onclick="deleteMeeting('${m.id}')">🗑️ Sil</button>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    // ==================== 2 GÜN ÖNCEDEN DERS PROGRAMINDA GÖRÜNME ====================
+    // ==================== HATIRLATMA & BÜYÜK UYARI MOTORU ====================
 
-    function checkMeetingVisibilityInSchedule() {
-      const banner = document.getElementById('meetingReminderBanner');
+    function checkAllReminders() {
       const now = new Date();
+      checkBanners(now);
+      checkBigAlerts(now);
+    }
 
-      // Gelecek ve günü gelmeden en fazla 2 gün önce olan İLK toplantıyı bul
+    // Ders programındaki üst banner'lar (1-2 gün öncesi)
+    function checkBanners(now) {
+      // 1. SINAV BANNERI KONTROLÜ
+      const examBanner = document.getElementById('examReminderBanner');
+      let upcomingExam = null;
+      let minExamDiffMs = Infinity;
+
+      exams.forEach(e => {
+        if (isItemExpired(e)) return;
+        const [y, mo, d] = e.date.split('-').map(Number);
+        const [sh, sm] = e.startTime.split(':').map(Number);
+        const startDt = new Date(y, mo - 1, d, sh, sm, 0);
+
+        // 2 gün öncesinin başlangıcı
+        const twoDaysBefore = new Date(y, mo - 1, d - 2, 0, 0, 0);
+
+        if (now >= twoDaysBefore && now <= startDt) {
+          const diff = startDt - now;
+          if (diff < minExamDiffMs) {
+            minExamDiffMs = diff;
+            upcomingExam = { ...e, startDt, diffMs: diff };
+          }
+        }
+      });
+
+      if (upcomingExam) {
+        examBanner.classList.add('active');
+        document.getElementById('erbTitle').innerText = `${upcomingExam.title} (${upcomingExam.code})`;
+        document.getElementById('erbDate').innerText = '📅 ' + upcomingExam.date;
+        document.getElementById('erbTime').innerText = `⏱ ${upcomingExam.startTime} - ${upcomingExam.endTime}`;
+        document.getElementById('erbLoc').innerText = '📍 ' + upcomingExam.location;
+
+        const hoursLeft = Math.floor(upcomingExam.diffMs / 3600000);
+        const minsLeft = Math.floor((upcomingExam.diffMs % 3600000) / 60000);
+        document.getElementById('erbCountdown').innerText = `⏳ Sınava ${hoursLeft}s ${minsLeft}dk kaldı!`;
+      } else {
+        examBanner.classList.remove('active');
+      }
+
+      // 2. TOPLANTI BANNERI KONTROLÜ
+      const meetBanner = document.getElementById('meetingReminderBanner');
       let upcomingMeeting = null;
-      let minDiffMs = Infinity;
+      let minMeetDiffMs = Infinity;
 
       meetings.forEach(m => {
-        if (isMeetingExpired(m)) return; // Bitişten sonra kalksın kuralı!
-
+        if (isItemExpired(m)) return;
         const [y, mo, d] = m.date.split('-').map(Number);
         const [sh, sm] = m.startTime.split(':').map(Number);
         const startDt = new Date(y, mo - 1, d, sh, sm, 0);
+        const twoDaysBefore = new Date(y, mo - 1, d - 2, 0, 0, 0);
 
-        // 2 gün öncesinin başlangıcı (00:00)
-        const twoDaysBeforeDt = new Date(y, mo - 1, d - 2, 0, 0, 0);
-
-        if (now >= twoDaysBeforeDt && now <= startDt) {
+        if (now >= twoDaysBefore && now <= startDt) {
           const diff = startDt - now;
-          if (diff < minDiffMs) {
-            minDiffMs = diff;
+          if (diff < minMeetDiffMs) {
+            minMeetDiffMs = diff;
             upcomingMeeting = { ...m, startDt };
           }
         }
       });
 
       if (upcomingMeeting) {
-        banner.classList.add('active');
+        meetBanner.classList.add('active');
         document.getElementById('mrbTitle').innerText = upcomingMeeting.title;
         document.getElementById('mrbDate').innerText = '📅 ' + upcomingMeeting.date;
         document.getElementById('mrbTime').innerText = `⏱ ${upcomingMeeting.startTime} - ${upcomingMeeting.endTime}`;
         document.getElementById('mrbLoc').innerText = '📍 ' + upcomingMeeting.location;
       } else {
-        banner.classList.remove('active');
+        meetBanner.classList.remove('active');
       }
     }
 
-    // ==================== 1 GÜN ÖNCE SAAT 22:00 BÜYÜK EKRAN UYARISI ====================
+    // 1 GÜN ÖNCE BÜYÜK EKRAN UYARISI (SINAV & TOPLANTI)
+    function checkBigAlerts(now) {
+      // Önce Sınavları Kontrol Et (Sınavlar önceliklidir!)
+      for (const e of exams) {
+        if (e.alertDismissed) continue;
+        if (isItemExpired(e)) continue;
+        if (e.snoozeUntil && now < new Date(e.snoozeUntil)) continue;
 
-    function checkBigMeetingAlert() {
-      const now = new Date();
+        const [y, mo, d] = e.date.split('-').map(Number);
+        const [sh, sm] = e.startTime.split(':').map(Number);
+        const [eh, em] = e.endTime.split(':').map(Number);
 
+        // 1 gün önce saat 22:00 VEYA sınava 24 saatten az kaldığında
+        const alertTriggerDt = new Date(y, mo - 1, d - 1, 22, 0, 0);
+        const examStartDt = new Date(y, mo - 1, d, sh, sm, 0);
+        const examEndDt = new Date(y, mo - 1, d, eh, em, 0);
+
+        const isWithin24Hours = (now >= alertTriggerDt || (examStartDt - now <= 24 * 3600000 && examStartDt > now));
+
+        if (isWithin24Hours && now <= examEndDt) {
+          triggerUniversalBigAlert('exam', e, examStartDt);
+          return;
+        }
+      }
+
+      // Sonra Toplantıları Kontrol Et
       for (const m of meetings) {
-        if (m.alertDismissed) continue; // "Sil/kapat dediğimde bir daha gelmesin"
-        if (isMeetingExpired(m)) continue; // Bitişten sonra kalksın
-
-        // Ertelenmişse süresini bekle
+        if (m.alertDismissed) continue;
+        if (isItemExpired(m)) continue;
         if (m.snoozeUntil && now < new Date(m.snoozeUntil)) continue;
 
         const [y, mo, d] = m.date.split('-').map(Number);
         const [sh, sm] = m.startTime.split(':').map(Number);
         const [eh, em] = m.endTime.split(':').map(Number);
 
-        // 1 gün önce saat 22:00 tetiklenme zamanı
         const alertTriggerDt = new Date(y, mo - 1, d - 1, 22, 0, 0);
-        const meetingEndDt = new Date(y, mo - 1, d, eh, em, 0);
+        const meetEndDt = new Date(y, mo - 1, d, eh, em, 0);
+        const meetStartDt = new Date(y, mo - 1, d, sh, sm, 0);
 
-        // Eğer şu an 1 gün önceki 22:00'den büyük veya eşitse ve toplantı henüz bitmediyse
-        if (now >= alertTriggerDt && now <= meetingEndDt) {
-          triggerBigAlert(m);
-          break; // Aynı anda 1 büyük alert göster
+        if (now >= alertTriggerDt && now <= meetEndDt) {
+          triggerUniversalBigAlert('meeting', m, meetStartDt);
+          return;
         }
       }
     }
 
-    function triggerBigAlert(meeting) {
-      currentActiveBigAlertMeeting = meeting;
-      const modal = document.getElementById('bigMeetingAlertModal');
-      document.getElementById('bamTitle').innerText = meeting.title;
-      document.getElementById('bamDate').innerText = meeting.date;
-      document.getElementById('bamTime').innerText = `${meeting.startTime} - ${meeting.endTime}`;
-      document.getElementById('bamLoc').innerText = meeting.location;
+    function triggerUniversalBigAlert(type, item, startDt) {
+      currentActiveBigAlert = { type, item };
+      const modal = document.getElementById('universalBigAlertModal');
+      const card = document.getElementById('universalBigAlertCard');
+      const icon = document.getElementById('bamIcon');
+      const tag = document.getElementById('bamTag');
+      const title = document.getElementById('bamTitle');
+      const codeRow = document.getElementById('bamCodeRow');
 
-      const [y, mo, d] = meeting.date.split('-').map(Number);
-      const [sh, sm] = meeting.startTime.split(':').map(Number);
-      const startDt = new Date(y, mo - 1, d, sh, sm, 0);
+      if (type === 'exam') {
+        card.classList.add('exam-alert-border');
+        icon.classList.add('exam-icon-bg');
+        icon.innerText = '📝';
+        tag.innerText = '🚨 ÖNEMLİ SINAV HATIRLATMASI';
+        tag.style.background = '#fee2e2';
+        tag.style.color = '#dc2626';
+        title.innerText = item.title;
+        codeRow.style.display = 'flex';
+        document.getElementById('bamCode').innerText = item.code;
+      } else {
+        card.classList.remove('exam-alert-border');
+        icon.classList.remove('exam-icon-bg');
+        icon.innerText = '📢';
+        tag.innerText = '🏛️ ÖNEMLİ TOPLANTI HATIRLATMASI';
+        tag.style.background = '#ede9fe';
+        tag.style.color = '#7c3aed';
+        title.innerText = item.title;
+        codeRow.style.display = 'none';
+      }
+
+      document.getElementById('bamDate').innerText = item.date;
+      document.getElementById('bamTime').innerText = `${item.startTime} - ${item.endTime}`;
+      document.getElementById('bamLoc').innerText = item.location;
+
       const diffMin = Math.round((startDt - new Date()) / 60000);
-
       let remainText = '';
       if (diffMin > 60) {
         const hours = Math.floor(diffMin / 60);
@@ -1353,31 +1800,36 @@
     }
 
     function snoozeCurrentBigAlert() {
-      if (!currentActiveBigAlertMeeting) return;
+      if (!currentActiveBigAlert) return;
       const hours = parseInt(document.getElementById('snoozeHoursSelect').value) || 1;
       const snoozeUntil = new Date(Date.now() + hours * 3600000).toISOString();
 
-      const m = meetings.find(item => item.id === currentActiveBigAlertMeeting.id);
-      if (m) {
-        m.snoozeUntil = snoozeUntil;
-        saveMeetings();
+      if (currentActiveBigAlert.type === 'exam') {
+        const e = exams.find(x => x.id === currentActiveBigAlert.item.id);
+        if (e) { e.snoozeUntil = snoozeUntil; saveExams(); }
+      } else {
+        const m = meetings.find(x => x.id === currentActiveBigAlert.item.id);
+        if (m) { m.snoozeUntil = snoozeUntil; saveMeetings(); }
       }
 
-      document.getElementById('bigMeetingAlertModal').classList.remove('active');
-      currentActiveBigAlertMeeting = null;
-      alert(`Toplantı uyarısı ${hours} saat sonraya ertelendi.`);
+      document.getElementById('universalBigAlertModal').classList.remove('active');
+      currentActiveBigAlert = null;
+      alert(`Uyarı ${hours} saat sonraya ertelendi.`);
     }
 
     function dismissCurrentBigAlert() {
-      if (!currentActiveBigAlertMeeting) return;
-      const m = meetings.find(item => item.id === currentActiveBigAlertMeeting.id);
-      if (m) {
-        m.alertDismissed = true; // Bir daha bu toplantı için ekran uyarısı gelmez
-        saveMeetings();
+      if (!currentActiveBigAlert) return;
+      if (currentActiveBigAlert.type === 'exam') {
+        const e = exams.find(x => x.id === currentActiveBigAlert.item.id);
+        if (e) { e.alertDismissed = true; saveExams(); }
+      } else {
+        const m = meetings.find(x => x.id === currentActiveBigAlert.item.id);
+        if (m) { m.alertDismissed = true; saveMeetings(); }
       }
-      document.getElementById('bigMeetingAlertModal').classList.remove('active');
-      currentActiveBigAlertMeeting = null;
-      alert('Bu toplantının ekran uyarısı kapatıldı. Toplantı sekmesinde durmaya devam edecektir.');
+
+      document.getElementById('universalBigAlertModal').classList.remove('active');
+      currentActiveBigAlert = null;
+      alert('Bu faaliyetin ekran uyarısı kapatıldı. Kendi sekmesinde yer almaya devam edecektir.');
     }
 
     // ==================== DERS PROGRAMI LİSTELEME ====================
@@ -1431,32 +1883,50 @@
         }
       });
 
-      // 3. O güne denk gelen ve 2 gün önceden görünen TOPLANTILARI listeye ekle
+      // 3. SINAVLARI DERS PROGRAMI LİSTESİNE EKLE (Günü geldiğinde veya 1 gün önceden)
       const now = new Date();
+      exams.forEach(e => {
+        if (isItemExpired(e)) return;
+
+        const [y, mo, d] = e.date.split('-').map(Number);
+        const eDateObj = new Date(y, mo - 1, d);
+        let eDayOfWeek = eDateObj.getDay();
+        if (eDayOfWeek === 0) eDayOfWeek = 7;
+
+        if (eDayOfWeek === dayNum) {
+          result.push({
+            id: e.id,
+            start: e.startTime,
+            end: e.endTime,
+            code: e.code,
+            title: '📝 SINAV: ' + e.title,
+            room: e.location,
+            roomClass: 'room-exam',
+            isExamItem: true
+          });
+        }
+      });
+
+      // 4. TOPLANTILARI DERS PROGRAMI LİSTESİNE EKLE
       meetings.forEach(m => {
-        if (isMeetingExpired(m)) return; // Bitişten sonra kalksın kuralı!
+        if (isItemExpired(m)) return;
 
         const [y, mo, d] = m.date.split('-').map(Number);
         const mDateObj = new Date(y, mo - 1, d);
-        let mDayOfWeek = mDateObj.getDay(); // 0: Pazar, 1: Pazartesi...
+        let mDayOfWeek = mDateObj.getDay();
         if (mDayOfWeek === 0) mDayOfWeek = 7;
 
-        // Seçili güne mi denk geliyor?
         if (mDayOfWeek === dayNum) {
-          // 2 gün önceden görünme kuralı
-          const twoDaysBefore = new Date(y, mo - 1, d - 2, 0, 0, 0);
-          if (now >= twoDaysBefore) {
-            result.push({
-              id: m.id,
-              start: m.startTime,
-              end: m.endTime,
-              code: 'TOPLANTI',
-              title: '🏛️ ' + m.title,
-              room: m.location,
-              roomClass: 'room-meeting',
-              isMeetingItem: true
-            });
-          }
+          result.push({
+            id: m.id,
+            start: m.startTime,
+            end: m.endTime,
+            code: 'TOPLANTI',
+            title: '🏛️ ' + m.title,
+            room: m.location,
+            roomClass: 'room-meeting',
+            isMeetingItem: true
+          });
         }
       });
 
@@ -1479,7 +1949,7 @@
       if (slots.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>🎉 Bugün Ders veya Toplantınız Yok</h3>
+            <h3>🎉 Bugün Ders veya Faaliyetiniz Yok</h3>
             <p>${dayNames[activeDay]} günü programınızda tanımlı faaliyet bulunmamaktadır.</p>
           </div>
         `;
@@ -1502,6 +1972,7 @@
         let cardClasses = ['slot-card'];
         if (isNow) cardClasses.push('current-active');
         if (slot.isMovedSource) cardClasses.push('moved-source');
+        if (slot.isExamItem) cardClasses.push('exam-slot-card');
         if (slot.isMeetingItem) cardClasses.push('meeting-slot-card');
 
         card.className = cardClasses.join(' ');
@@ -1513,13 +1984,17 @@
           statusBadgeHtml = `<div class="moved-badge">⚠️ ${dayNames[slot.movedTargetDay]} ${slot.movedTargetSlot}'e taşındı (${slot.movedTargetRoom})</div>`;
         } else if (slot.isRelocatedTarget) {
           statusBadgeHtml = `<div class="relocated-target-badge">🔄 ${dayNames[slot.fromDay]} ${slot.origStart}'den buraya taşındı</div>`;
+        } else if (slot.isExamItem) {
+          statusBadgeHtml = `<span style="background:var(--exam-color); color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ SINAV</span>`;
         } else if (slot.isMeetingItem) {
-          statusBadgeHtml = `<span style="background:#8b5cf6; color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ TOPLANTI</span>`;
+          statusBadgeHtml = `<span style="background:var(--meeting-color); color:white; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px;">RESMİ TOPLANTI</span>`;
         }
 
         let actionBtnHtml = '';
-        if (slot.isMeetingItem) {
-          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--primary);">Toplantılar sekmesinden yönetilir</span>`;
+        if (slot.isExamItem) {
+          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--exam-color);">Sınavlar sekmesinde kayıtlı</span>`;
+        } else if (slot.isMeetingItem) {
+          actionBtnHtml = `<span style="font-size:11px; font-weight:700; color:var(--meeting-color);">Toplantılar sekmesinde kayıtlı</span>`;
         } else if (slot.isMovedSource || slot.isRelocatedTarget) {
           const keyToUndo = slot.overrideKey || slot.id;
           actionBtnHtml = `<button class="undo-btn" onclick="undoMove('${keyToUndo}')">↩ Orijinaline Döndür</button>`;
@@ -1651,13 +2126,12 @@
     function updateClock() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString('tr-TR', { hour12: false });
-      const dateStr = now.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
+      const dateStr = now.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('currentTimeStr').innerText = timeStr;
       document.getElementById('currentDateStr').innerText = dateStr;
 
       checkCurrentStatus(now);
-      checkMeetingVisibilityInSchedule();
-      checkBigMeetingAlert();
+      checkAllReminders();
     }
 
     function checkCurrentStatus(now) {
@@ -1677,7 +2151,7 @@
       const todaySlots = getComputedSlotsForDay(currentDay).filter(s => !s.isMovedSource);
       if (todaySlots.length === 0) {
         liveTagTitle.innerText = "SERBEST GÜN";
-        liveStatusText.innerText = "Bugün programınızda ders veya toplantı bulunmuyor.";
+        liveStatusText.innerText = "Bugün programınızda ders veya faaliyet bulunmuyor.";
         liveSubText.innerText = "Akademik ve idari çalışma günü.";
         return;
       }
@@ -1700,11 +2174,19 @@
       }
 
       if (currentSlot) {
-        liveTagTitle.innerText = currentSlot.isMeetingItem ? "CANLI • TOPLANTI DEVAM EDİYOR" : "CANLI • DERS DEVAM EDİYOR";
+        let tagText = "CANLI • DERS DEVAM EDİYOR";
+        if (slot.isExamItem) tagText = "CANLI • SINAV DEVAM EDİYOR";
+        else if (slot.isMeetingItem) tagText = "CANLI • TOPLANTI DEVAM EDİYOR";
+
+        liveTagTitle.innerText = tagText;
         liveStatusText.innerText = `${currentSlot.title} (${currentSlot.room})`;
         liveSubText.innerText = `Bitişe ${currentSlot.remainMin} dakika kaldı.`;
       } else if (nextSlot) {
-        liveTagTitle.innerText = nextSlot.isMeetingItem ? "SIRADAKİ TOPLANTI" : "SIRADAKİ DERS";
+        let tagText = "SIRADAKİ DERS";
+        if (nextSlot.isExamItem) tagText = "SIRADAKİ SINAV";
+        else if (nextSlot.isMeetingItem) tagText = "SIRADAKİ TOPLANTI";
+
+        liveTagTitle.innerText = tagText;
         liveStatusText.innerText = `${nextSlot.title} — ${nextSlot.room}`;
         liveSubText.innerText = `Saat ${nextSlot.start}'te başlıyor (${nextSlot.startInMin} dk kaldı).`;
       } else {
@@ -1718,15 +2200,16 @@
       let icsContent = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//MKU KMYO//Fatih Akman CAKMAK Ders Programi//TR",
+        "PRODID:-//MKU KMYO//Fatih Akman CAKMAK Ders Sınav ve Toplantı//TR",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH"
       ];
 
       const dayOffsetMap = { 1: "MO", 2: "TU", 3: "WE", 4: "TH", 5: "FR" };
       
+      // Haftalık dersler
       for (let dayNum = 1; dayNum <= 5; dayNum++) {
-        const slots = getComputedSlotsForDay(dayNum).filter(s => !s.isMovedSource && !s.isMeetingItem);
+        const slots = getComputedSlotsForDay(dayNum).filter(s => !s.isMovedSource && !s.isMeetingItem && !s.isExamItem);
         if (slots.length === 0) continue;
         const rruleDay = dayOffsetMap[dayNum];
 
@@ -1752,7 +2235,29 @@
         });
       }
 
-      // Toplantıları da takvime ekle
+      // Sınavlar
+      exams.forEach((e, idx) => {
+        const cleanDate = e.date.replace(/-/g, '');
+        const sHour = e.startTime.replace(':', '') + "00";
+        const eHour = e.endTime.replace(':', '') + "00";
+        icsContent.push(
+          "BEGIN:VEVENT",
+          `UID:kmyo-exam-${idx}@mku.edu.tr`,
+          `SUMMARY:📝 SINAV: ${e.title} (${e.location})`,
+          `LOCATION:${e.location}`,
+          `DESCRIPTION:Ders Kodu: ${e.code}\\nSınav Salonu: ${e.location}\\nÖğr. Gör. Fatih Akman ÇAKMAK`,
+          `DTSTART:${cleanDate}T${sHour}`,
+          `DTEND:${cleanDate}T${eHour}`,
+          "BEGIN:VALARM",
+          "TRIGGER:-PT15M",
+          "ACTION:DISPLAY",
+          "DESCRIPTION:15 dakika sonra sınav başlayacak!",
+          "END:VALARM",
+          "END:VEVENT"
+        );
+      });
+
+      // Toplantılar
       meetings.forEach((m, idx) => {
         const cleanDate = m.date.replace(/-/g, '');
         const sHour = m.startTime.replace(':', '') + "00";
@@ -1780,7 +2285,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Fatih_Akman_Cakmak_Guncel_Ders_ve_Toplanti_Programi.ics";
+      a.download = "Fatih_Akman_Cakmak_Ders_Sinav_Toplanti_Programi.ics";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1795,12 +2300,13 @@
       updateClock();
       setInterval(updateClock, 1000);
       updateChangesBanner();
-      updateMeetingsBadge();
+      updateBadges();
       
-      // Bugünün tarihini toplantı inputuna otomatik ver
       const todayIso = now.toISOString().split('T')[0];
-      const inpDate = document.getElementById('inpMeetingDate');
-      if (inpDate) inpDate.value = todayIso;
+      const inpMeetingDate = document.getElementById('inpMeetingDate');
+      if (inpMeetingDate) inpMeetingDate.value = todayIso;
+      const inpExamDate = document.getElementById('inpExamDate');
+      if (inpExamDate) inpExamDate.value = todayIso;
     }
 
     window.onload = init;
