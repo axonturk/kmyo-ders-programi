@@ -473,6 +473,116 @@
       margin-top: 6px;
     }
 
+    /* Hızlı Süre ve Çıkış Yasağı Ayar Paneli */
+    .quick-adjust-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin: 14px 0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 14px 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .adjust-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .adjust-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .adjust-btn-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-step {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-step:hover, .btn-step:active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      transform: scale(1.05);
+    }
+
+    .adjust-num-disp {
+      font-size: 22px;
+      font-weight: 900;
+      color: #38bdf8;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .preset-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-pill:hover, .btn-pill.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+    }
+
+    .btn-big-start {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 16px;
+      font-size: 19px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-big-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(34, 197, 94, 0.6);
+    }
+
     @media (max-width: 768px) {
       body { padding: 1rem; }
       header { flex-direction: column; text-align: center; }
@@ -480,6 +590,8 @@
       .rules-grid { grid-template-columns: 1fr; }
       .control-dock { bottom: 10px; padding: 6px 10px; gap: 6px; }
       .btn-dock span.text { display: none; }
+      .quick-adjust-panel { padding: 10px; }
+      .adjust-box { min-width: 100%; }
     }
   </style>
 </head>
@@ -523,6 +635,49 @@
     <div class="exit-status-card status-forbidden" id="cntExitStatus">
       <span>🚫</span>
       <span id="txtExitStatusText">SALONDAN ÇIKIŞ YASAKTIR (Yasağın Bitmesine: 30 dk)</span>
+    </div>
+
+    <!-- BAŞLAT / DURAKLAT BÜYÜK BUTONU -->
+    <div id="boxMainStartBtn" style="margin: 10px 0;">
+      <button class="btn-big-start" id="btnBigStart" onclick="toggleTimer()">
+        <span id="bigStartIcon">▶</span>
+        <span id="bigStartText">SINAVI BAŞLAT</span>
+      </button>
+    </div>
+
+    <!-- DOĞRUDAN EKRANDAN HIZLI SÜRE VE ÇIKIŞ YASAĞI AYARLAMA PANELİ -->
+    <div class="quick-adjust-panel" id="quickAdjustPanel">
+      <div class="adjust-box">
+        <span class="adjust-title">⏱️ Sınav Süresi:</span>
+        <div class="adjust-btn-row">
+          <button class="btn-step" onclick="stepDuration(-5)">-5 dk</button>
+          <span class="adjust-num-disp" id="dispDurationValue">45 dk</span>
+          <button class="btn-step" onclick="stepDuration(+5)">+5 dk</button>
+        </div>
+        <div class="preset-pills">
+          <button class="btn-pill" onclick="setExactDuration(30)">30 dk</button>
+          <button class="btn-pill" onclick="setExactDuration(40)">40 dk</button>
+          <button class="btn-pill active" onclick="setExactDuration(45)">45 dk</button>
+          <button class="btn-pill" onclick="setExactDuration(50)">50 dk</button>
+          <button class="btn-pill" onclick="setExactDuration(60)">60 dk</button>
+          <button class="btn-pill" onclick="setExactDuration(75)">75 dk</button>
+        </div>
+      </div>
+
+      <div class="adjust-box">
+        <span class="adjust-title">🚫 Erken Çıkış Yasağı:</span>
+        <div class="adjust-btn-row">
+          <button class="btn-step" onclick="stepEarlyExit(-5)">-5 dk</button>
+          <span class="adjust-num-disp" id="dispEarlyExitValue">30 dk</span>
+          <button class="btn-step" onclick="stepEarlyExit(+5)">+5 dk</button>
+        </div>
+        <div class="preset-pills">
+          <button class="btn-pill" onclick="setExactEarlyExit(15)">15 dk</button>
+          <button class="btn-pill" onclick="setExactEarlyExit(20)">20 dk</button>
+          <button class="btn-pill active" onclick="setExactEarlyExit(30)">30 dk</button>
+          <button class="btn-pill" onclick="setExactEarlyExit(0)">Yasak Yok (0)</button>
+        </div>
+      </div>
     </div>
 
     <!-- HOCA CANLI DUYURU BANDI -->
@@ -684,11 +839,99 @@
       }
     });
 
+    let isStarted = false;
+
     function init() {
       applyConfigToUI();
-      startClocks();
-      playChime('start');
+      updateRealClock();
+      setInterval(updateRealClock, 1000);
+
+      document.getElementById('dispDurationValue').innerText = examConfig.totalDurationMinutes + ' dk';
+      document.getElementById('dispEarlyExitValue').innerText = examConfig.earlyExitMinutes === 0 ? 'Yok (0)' : examConfig.earlyExitMinutes + ' dk';
+
+      renderTimer();
       resetActivityTimer();
+
+      if (params.get('autostart') === '1') {
+        startExam();
+      } else {
+        document.getElementById('timerLabel').innerText = 'SINAV HAZIR (BAŞLAMADI)';
+        const elCard = document.getElementById('cntExitStatus');
+        elCard.className = 'exit-status-card status-allowed';
+        elCard.innerHTML = `<span>⚙️</span><span>Süreyi ve Çıkış Yasağını Ayarlayıp "SINAVI BAŞLAT"a Basınız</span>`;
+        document.getElementById('bigStartIcon').innerText = '▶';
+        document.getElementById('bigStartText').innerText = 'SINAVI BAŞLAT';
+        document.getElementById('btnToggleIcon').innerText = '▶';
+        document.getElementById('btnToggleText').innerText = 'Başlat';
+      }
+    }
+
+    function startExam() {
+      if (isStarted) return;
+      isStarted = true;
+      isPaused = false;
+      document.getElementById('timerLabel').innerText = 'KALAN SINAV SÜRESİ';
+      document.getElementById('bigStartIcon').innerText = '⏸';
+      document.getElementById('bigStartText').innerText = 'DURAKLAT';
+      document.getElementById('btnToggleIcon').innerText = '⏸';
+      document.getElementById('btnToggleText').innerText = 'Duraklat';
+
+      playChime('start');
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isPaused && !isFinished && isStarted) {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            renderTimer();
+            if (remainingSeconds === 300) { // Son 5 dk
+              playChime('warning');
+            }
+          } else {
+            finishExam();
+          }
+        }
+      }, 1000);
+      broadcastState();
+    }
+
+    function stepDuration(deltaMins) {
+      let newDur = examConfig.totalDurationMinutes + deltaMins;
+      if (newDur < 5) newDur = 5;
+      if (newDur > 180) newDur = 180;
+      setExactDuration(newDur);
+    }
+
+    function setExactDuration(mins) {
+      const diffSec = (mins * 60) - totalSeconds;
+      totalSeconds = mins * 60;
+      examConfig.totalDurationMinutes = mins;
+
+      if (!isStarted) {
+        remainingSeconds = totalSeconds;
+      } else {
+        remainingSeconds = Math.max(0, remainingSeconds + diffSec);
+      }
+
+      document.getElementById('dispDurationValue').innerText = mins + ' dk';
+      renderTimer();
+      broadcastState();
+    }
+
+    function stepEarlyExit(deltaMins) {
+      let newEarly = examConfig.earlyExitMinutes + deltaMins;
+      if (newEarly < 0) newEarly = 0;
+      if (newEarly > examConfig.totalDurationMinutes) newEarly = examConfig.totalDurationMinutes;
+      setExactEarlyExit(newEarly);
+    }
+
+    function setExactEarlyExit(mins) {
+      examConfig.earlyExitMinutes = mins;
+      document.getElementById('dispEarlyExitValue').innerText = mins === 0 ? 'Yok (0)' : mins + ' dk';
+      if (isStarted) {
+        updateExitRestriction(totalSeconds - remainingSeconds);
+      }
+      broadcastState();
     }
 
     function applyConfigToUI() {
@@ -816,16 +1059,27 @@
     // ==================== KONTROL VE KUMANDA EYLEMLERİ ====================
 
     function toggleTimer() {
+      if (!isStarted) {
+        startExam();
+        return;
+      }
       isPaused = !isPaused;
       const btnIcon = document.getElementById('btnToggleIcon');
       const btnText = document.getElementById('btnToggleText');
+      const bigIcon = document.getElementById('bigStartIcon');
+      const bigText = document.getElementById('bigStartText');
+
       if (isPaused) {
-        btnIcon.innerText = '▶';
-        btnText.innerText = 'Devam Et';
+        if (btnIcon) btnIcon.innerText = '▶';
+        if (btnText) btnText.innerText = 'Devam';
+        if (bigIcon) bigIcon.innerText = '▶';
+        if (bigText) bigText.innerText = 'DEVAM ET';
         document.getElementById('timerLabel').innerText = '⏸ SINAV DURAKLATILDI';
       } else {
-        btnIcon.innerText = '⏸';
-        btnText.innerText = 'Duraklat';
+        if (btnIcon) btnIcon.innerText = '⏸';
+        if (btnText) btnText.innerText = 'Duraklat';
+        if (bigIcon) bigIcon.innerText = '⏸';
+        if (bigText) bigText.innerText = 'DURAKLAT';
         document.getElementById('timerLabel').innerText = 'KALAN SINAV SÜRESİ';
       }
       broadcastState();

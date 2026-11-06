@@ -1409,14 +1409,16 @@
           <span style="font-size:11px; color:var(--text-muted);">İstediğiniz süreyi girin</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
-          <input type="number" class="form-input" id="projTabDuration" value="45" min="5" max="180" style="font-size:16px; font-weight:800; width:100px; margin-bottom:0;">
+          <button type="button" class="btn-time-pill" onclick="stepProjTabDuration(-5)" style="background:rgba(56,189,248,0.2); border-color:#38bdf8; font-weight:800; font-size:13px; padding:6px 12px;">-5 dk</button>
+          <input type="number" class="form-input" id="projTabDuration" value="45" min="5" max="180" style="font-size:18px; font-weight:900; width:85px; text-align:center; color:#38bdf8; margin-bottom:0;">
+          <button type="button" class="btn-time-pill" onclick="stepProjTabDuration(+5)" style="background:rgba(56,189,248,0.2); border-color:#38bdf8; font-weight:800; font-size:13px; padding:6px 12px;">+5 dk</button>
           <div style="display:flex; gap:4px; flex-wrap:wrap;">
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(30)">30 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(40)">40 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(45)">45 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(50)">50 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(60)">60 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(75)">75 dk</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(30)">30</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(40)">40</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(45)">45</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(50)">50</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(60)">60</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabDuration(75)">75</button>
           </div>
         </div>
       </div>
@@ -1430,12 +1432,14 @@
           <span style="font-size:11px; color:var(--text-muted);">Çıkışın yasak olduğu ilk süre</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-          <input type="number" class="form-input" id="projTabEarlyExit" value="30" min="0" max="120" style="font-size:15px; font-weight:800; width:100px; margin-bottom:0;">
+          <button type="button" class="btn-time-pill" onclick="stepProjTabEarlyExit(-5)" style="background:rgba(239,68,68,0.2); border-color:#ef4444; font-weight:800; font-size:13px; padding:6px 12px;">-5 dk</button>
+          <input type="number" class="form-input" id="projTabEarlyExit" value="30" min="0" max="120" style="font-size:18px; font-weight:900; width:85px; text-align:center; color:#ef4444; margin-bottom:0;">
+          <button type="button" class="btn-time-pill" onclick="stepProjTabEarlyExit(+5)" style="background:rgba(239,68,68,0.2); border-color:#ef4444; font-weight:800; font-size:13px; padding:6px 12px;">+5 dk</button>
           <div style="display:flex; gap:4px; flex-wrap:wrap;">
-            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(15)">15 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(20)">20 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(30)">30 dk</button>
-            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(0)">Yasak Yok (0)</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(15)">15</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(20)">20</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(30)">30</button>
+            <button type="button" class="btn-time-pill" onclick="setProjTabEarlyExit(0)">Yok (0)</button>
           </div>
         </div>
 
@@ -1487,6 +1491,22 @@
       <!-- İlerleme Çubuğu -->
       <div style="width:100%; height:10px; background:rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; margin-bottom:16px;">
         <div id="tabLiveProgress" style="width:100%; height:100%; background:linear-gradient(90deg, #0284c7, #38bdf8); transition:width 1s linear;"></div>
+      </div>
+
+      <!-- Canlı Çalışırken Hızlı Süre ve Çıkış Yasağı Ayarlama -->
+      <div style="display:flex; justify-content:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+        <div style="background:rgba(255,255,255,0.06); padding:6px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.25); display:flex; align-items:center; gap:6px;">
+          <span style="font-size:11px; font-weight:800; color:#94a3b8;">⏱️ SÜRE:</span>
+          <button class="btn-dock" style="padding:4px 8px; font-size:11px;" onclick="tabLiveAddMinutes(-5)">-5 dk</button>
+          <span id="tabLiveDurDisp" style="font-size:13px; font-weight:900; color:#38bdf8;">45 dk</span>
+          <button class="btn-dock" style="padding:4px 8px; font-size:11px;" onclick="tabLiveAddMinutes(+5)">+5 dk</button>
+        </div>
+        <div style="background:rgba(255,255,255,0.06); padding:6px 12px; border-radius:12px; border:1px solid rgba(239,68,68,0.25); display:flex; align-items:center; gap:6px;">
+          <span style="font-size:11px; font-weight:800; color:#ef4444;">🚫 YASAK:</span>
+          <button class="btn-dock" style="padding:4px 8px; font-size:11px;" onclick="tabLiveStepEarlyExit(-5)">-5 dk</button>
+          <span id="tabLiveEarlyDisp" style="font-size:13px; font-weight:900; color:#f87171;">30 dk</span>
+          <button class="btn-dock" style="padding:4px 8px; font-size:11px;" onclick="tabLiveStepEarlyExit(+5)">+5 dk</button>
+        </div>
       </div>
 
       <!-- Hoca Kumanda Butonları (Telefonda dokunulacak butonlar) -->
@@ -3658,6 +3678,10 @@
       document.getElementById('tabLiveCourseTitle').innerText = courseName;
       document.getElementById('tabLiveExamType').innerText = examType.toUpperCase();
       document.getElementById('tabLiveRoom').innerText = '📍 ' + roomName;
+      const durDisp = document.getElementById('tabLiveDurDisp');
+      if (durDisp) durDisp.innerText = totalDur + ' dk';
+      const earlyDisp = document.getElementById('tabLiveEarlyDisp');
+      if (earlyDisp) earlyDisp.innerText = earlyExit === 0 ? 'Yok (0)' : earlyExit + ' dk';
 
       renderTabLiveTimer();
       clearInterval(tabLiveInterval);
@@ -3716,11 +3740,33 @@
       }
     }
 
+    function stepProjTabDuration(delta) {
+      let cur = parseInt(document.getElementById('projTabDuration').value) || 45;
+      cur = Math.max(5, Math.min(180, cur + delta));
+      document.getElementById('projTabDuration').value = cur;
+    }
+
+    function stepProjTabEarlyExit(delta) {
+      let cur = parseInt(document.getElementById('projTabEarlyExit').value) || 0;
+      cur = Math.max(0, Math.min(120, cur + delta));
+      document.getElementById('projTabEarlyExit').value = cur;
+    }
+
     function tabLiveAddMinutes(min) {
-      tabLiveRemaining += (min * 60);
-      tabLiveTotal += (min * 60);
+      tabLiveRemaining = Math.max(0, tabLiveRemaining + (min * 60));
+      tabLiveTotal = Math.max(tabLiveRemaining, tabLiveTotal + (min * 60));
+      const durDisp = document.getElementById('tabLiveDurDisp');
+      if (durDisp) durDisp.innerText = Math.round(tabLiveTotal / 60) + ' dk';
       renderTabLiveTimer();
       sendRemoteCommand('ADD_TIME', { minutes: min });
+    }
+
+    function tabLiveStepEarlyExit(delta) {
+      tabLiveEarlyExit = Math.max(0, Math.min(Math.floor(tabLiveTotal / 60), tabLiveEarlyExit + delta));
+      const earlyDisp = document.getElementById('tabLiveEarlyDisp');
+      if (earlyDisp) earlyDisp.innerText = tabLiveEarlyExit === 0 ? 'Yok (0)' : tabLiveEarlyExit + ' dk';
+      renderTabLiveTimer();
+      sendRemoteCommand('STATE_UPDATE', { earlyExitMinutes: tabLiveEarlyExit });
     }
 
     function tabLivePromptAnnouncement() {
